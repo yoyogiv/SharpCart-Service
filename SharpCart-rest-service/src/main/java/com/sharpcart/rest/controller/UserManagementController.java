@@ -188,4 +188,84 @@ public class UserManagementController {
 	  	
         return result;
     }
+    
+	/*
+	 * Register a new user
+	 */
+    @RequestMapping(value="/aggregators/user/update",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String updateUser(@RequestBody final UserProfile jsonUser) {
+    	
+    	String result = SharpCartConstants.SERVER_ERROR_CODE;
+    	
+    	//debug
+    	LOG.info("User Name: "+jsonUser.getUserName()); //name
+    	LOG.info("User Password: "+jsonUser.getPassword()); //password
+    	LOG.info("User Zip: "+jsonUser.getZip()); //zip
+    	LOG.info("User Family Size: "+jsonUser.getFamilySize()); //family size
+    	LOG.info("User Stores: "+jsonUser.getStores()); //stores
+    	
+    	//check if user already exits in the system
+	  	session = factory.openSession();
+		  
+	  	session.beginTransaction();
+	  	Query query = session.createQuery("from SharpCartUser where userName = :userName");
+	  	query.setString("userName", jsonUser.getUserName());
+	  	SharpCartUser user = (SharpCartUser)query.uniqueResult();
+	  	session.getTransaction().commit();
+	  	
+	  	//if we dont have the user in our database we return access denied
+	  	if (user==null)
+	  		result = SharpCartConstants.ACCESS_DENIED;
+	  	else //update user in database
+	  	{
+	  	  /* The user we created from the JSON file is NOT the same user we
+	  	   * can add to the database, namely they use different "stores" variable.
+	  	   * In order to be able to save the JSON user in the database we need to convert it
+	  	   * to our persistence user model
+	  	   */
+
+	  		user.setZip(jsonUser.getZip());
+	  		user.setFamilySize(jsonUser.getFamilySize());
+	  	  
+	  		//Convert the JSON stores string to a set of store objects
+	  		String stores[] = jsonUser.getStores().split("-");
+	  	  
+	  		//grab stores from database
+	  		session.beginTransaction();	
+	  		query = session.createQuery("from Store");
+	  		List<Store> storeList = query.list();	
+	  		session.getTransaction().commit();
+		  
+	  		Set<Store> userStores = new HashSet<Store>();
+	  	  
+	  		for (String storeId : stores)
+	  		{
+	  			for (Store store : storeList)
+	  			{
+	  			  if (store.getId()==Long.valueOf(storeId))
+	  			  {
+	  				  userStores.add(store);
+	  			  }
+	  			}
+	  		}
+	  	  
+	  		user.setStores(userStores);
+	  	  
+	  		//save user into database
+	  		session.beginTransaction();
+	  		session.update(user);
+	  		session.getTransaction().commit();
+		  
+	  		result = SharpCartConstants.RECORD_CREATED;
+	  	}
+	  	
+	  	//close session
+	  	session.close();
+	  	
+	  	//debug
+    	LOG.info("Return Code: "+result); 
+    	
+    	return result;
+    }
 }
