@@ -1,0 +1,82 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "http://repo.spring.io/libs-snapshot" }
+	    maven { url "http://download.java.net/maven/2" }
+	    maven { url 'http://repo.spring.io/plugins-release' }
+	}
+    dependencies {
+    	classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.1'
+    }
+}
+
+apply plugin: 'propdeps'
+apply plugin: 'propdeps-maven'
+apply plugin: 'propdeps-idea'
+apply plugin: 'propdeps-eclipse'
+apply plugin: 'war'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.7
+version = '1.0'
+
+war {
+    manifest {
+        attributes 'Implementation-Title': 'SharpCart REST Service', 'Implementation-Version': version
+    }
+    
+    baseName = 'sharpcart'
+    version =  '1.0'
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://repo.spring.io/libs-snapshot" }
+    maven { url 'http://repo.spring.io/milestone/'}
+}
+
+dependencies {
+	provided 'javax.servlet:javax.servlet-api:3.0.1'
+	
+	//spring 3.2
+    compile 'org.springframework:spring-core:3.2.3.RELEASE'
+    compile 'org.springframework:spring-webmvc:3.2.3.RELEASE'
+    
+    // {!begin security}
+    compile 'org.springframework.security:spring-security-web:3.2.0.M2'
+    compile 'org.springframework.security:spring-security-core:3.2.0.M2'
+    compile 'org.springframework.security:spring-security-config:3.2.0.M2'
+    // {!end security}
+    
+    //hibernate
+    compile 'org.hibernate:hibernate-core:4.3.4.Final'
+    compile 'mysql:mysql-connector-java:5.1.29'
+	
+	//logging
+	compile 'org.slf4j:slf4j-api:1.7.5'
+    runtime 'org.slf4j:slf4j-jdk14:1.7.5'
+    
+	//json and xml
+	compile 'com.jayway.jsonpath:json-path:0.8.1'
+    runtime 'com.fasterxml.jackson.core:jackson-core:2.2.2'
+    runtime 'com.fasterxml.jackson.core:jackson-databind:2.2.2'
+    runtime 'javax.xml.bind:jaxb-api:2.2.9'
+    
+    //tesing and commons
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+    testCompile 'org.hibernate:hibernate-core:4.3.4.Final'
+    testCompile 'mysql:mysql-connector-java:5.1.29'
+}
+
+test {
+    systemProperties 'property': 'value'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}
+
