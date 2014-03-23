@@ -219,45 +219,62 @@ public class UserManagementController {
 	  		result = SharpCartConstants.ACCESS_DENIED;
 	  	else //update user in database
 	  	{
-	  	  /* The user we created from the JSON file is NOT the same user we
-	  	   * can add to the database, namely they use different "stores" variable.
-	  	   * In order to be able to save the JSON user in the database we need to convert it
-	  	   * to our persistence user model
-	  	   */
+	  		//verify user password
+	  		try {
+				if (PasswordHash.validatePassword(jsonUser.getPassword(), user.getPassword()))
+				{
+				  	  /* The user we created from the JSON file is NOT the same user we
+				  	   * can add to the database, namely they use different "stores" variable.
+				  	   * In order to be able to save the JSON user in the database we need to convert it
+				  	   * to our persistence user model
+				  	   */
 
-	  		user.setZip(jsonUser.getZip());
-	  		user.setFamilySize(jsonUser.getFamilySize());
-	  	  
-	  		//Convert the JSON stores string to a set of store objects
-	  		String stores[] = jsonUser.getStores().split("-");
-	  	  
-	  		//grab stores from database
-	  		session.beginTransaction();	
-	  		query = session.createQuery("from Store");
-	  		List<Store> storeList = query.list();	
-	  		session.getTransaction().commit();
-		  
-	  		Set<Store> userStores = new HashSet<Store>();
-	  	  
-	  		for (String storeId : stores)
-	  		{
-	  			for (Store store : storeList)
-	  			{
-	  			  if (store.getId()==Long.valueOf(storeId))
-	  			  {
-	  				  userStores.add(store);
-	  			  }
-	  			}
-	  		}
-	  	  
-	  		user.setStores(userStores);
-	  	  
-	  		//save user into database
-	  		session.beginTransaction();
-	  		session.update(user);
-	  		session.getTransaction().commit();
-		  
-	  		result = SharpCartConstants.RECORD_CREATED;
+				  		user.setZip(jsonUser.getZip());
+				  		user.setFamilySize(jsonUser.getFamilySize());
+				  	  
+				  		//Convert the JSON stores string to a set of store objects
+				  		String stores[] = jsonUser.getStores().split("-");
+				  	  
+				  		//grab stores from database
+				  		session.beginTransaction();	
+				  		query = session.createQuery("from Store");
+				  		List<Store> storeList = query.list();	
+				  		session.getTransaction().commit();
+					  
+				  		Set<Store> userStores = new HashSet<Store>();
+				  	  
+				  		for (String storeId : stores)
+				  		{
+				  			for (Store store : storeList)
+				  			{
+				  			  if (store.getId()==Long.valueOf(storeId))
+				  			  {
+				  				  userStores.add(store);
+				  			  }
+				  			}
+				  		}
+				  	  
+				  		user.setStores(userStores);
+				  	  
+				  		//save user into database
+				  		session.beginTransaction();
+				  		session.update(user);
+				  		session.getTransaction().commit();
+					  
+				  		result = SharpCartConstants.RECORD_CREATED;
+				} else // user is in database but provided password is incorrect
+				{
+					result = SharpCartConstants.ACCESS_DENIED;
+				}
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				result = SharpCartConstants.SERVER_ERROR_CODE;
+			} catch (InvalidKeySpecException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				result = SharpCartConstants.SERVER_ERROR_CODE;
+			}
 	  	}
 	  	
 	  	//close session
