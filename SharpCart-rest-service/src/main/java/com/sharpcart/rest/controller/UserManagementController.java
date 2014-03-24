@@ -2,6 +2,8 @@ package com.sharpcart.rest.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -132,11 +134,17 @@ public class UserManagementController {
 		  	  
 		  	  if (!jsonUser.getLastUpdated().equalsIgnoreCase("Jan 1, 1970 12:00:00 AM"))
 		  	  {
-		  		  persistanceUser.setLastUpdated(new Date(jsonUser.getLastUpdated()));
+		  		  try {
+					persistanceUser.setLastUpdated(DateFormat.getDateInstance().parse(jsonUser.getLastUpdated()));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		  	  } else
 		  	  {
 		  		  persistanceUser.setLastUpdated(new Date());
 		  	  }
+		  	  
 		  	  //save user into database
 		  	  DAO.getInstance().begin();
 			  DAO.getInstance().getSession().save(persistanceUser);
@@ -254,45 +262,63 @@ public class UserManagementController {
 	  		try {
 				if (PasswordHash.validatePassword(jsonUser.getPassword(), user.getPassword()))
 				{
-				  	  /* The user we created from the JSON file is NOT the same user we
-				  	   * can add to the database, namely they use different "stores" variable.
-				  	   * In order to be able to save the JSON user in the database we need to convert it
-				  	   * to our persistence user model
-				  	   */
-
-				  		user.setZip(jsonUser.getZip());
-				  		user.setFamilySize(jsonUser.getFamilySize());
-				  	  
-				  		//Convert the JSON stores string to a set of store objects
-				  		String stores[] = jsonUser.getStores().split("-");
-				  	  
-				  		//grab stores from database
-				  		DAO.getInstance().begin();
-				  		query = DAO.getInstance().getSession().createQuery("from Store");
-				  		List<Store> storeList = query.list();	
-				  		DAO.getInstance().commit();
-					  
-				  		Set<Store> userStores = new HashSet<Store>();
-				  	  
-				  		for (String storeId : stores)
-				  		{
-				  			for (Store store : storeList)
-				  			{
-				  			  if (store.getId()==Long.valueOf(storeId))
-				  			  {
-				  				  userStores.add(store);
-				  			  }
-				  			}
-				  		}
-				  	  
-				  		user.setStores(userStores);
-				  	  
-				  		//save user into database
-				  		DAO.getInstance().begin();
-				  		DAO.getInstance().getSession().update(user);
-				  		DAO.getInstance().commit();
-					  
-				  		result = SharpCartConstants.RECORD_CREATED;
+					//only update the database if the device profile is newer
+					try {
+							if (user.getLastUpdated().after(DateFormat.getDateInstance().parse(jsonUser.getLastUpdated())))
+							{
+							  /* The user we created from the JSON file is NOT the same user we
+							   * can add to the database, namely they use different "stores" variable.
+							   * In order to be able to save the JSON user in the database we need to convert it
+							   * to our persistence user model
+							   */
+	
+								user.setZip(jsonUser.getZip());
+								user.setFamilySize(jsonUser.getFamilySize());
+							  
+								//Convert the JSON stores string to a set of store objects
+								String stores[] = jsonUser.getStores().split("-");
+							  
+								//grab stores from database
+								DAO.getInstance().begin();
+								query = DAO.getInstance().getSession().createQuery("from Store");
+								List<Store> storeList = query.list();	
+								DAO.getInstance().commit();
+							  
+								Set<Store> userStores = new HashSet<Store>();
+							  
+								for (String storeId : stores)
+								{
+									for (Store store : storeList)
+									{
+									  if (store.getId()==Long.valueOf(storeId))
+									  {
+										  userStores.add(store);
+									  }
+									}
+								}
+							  
+								user.setStores(userStores);
+							  
+								user.setLastUpdated(new Date());
+								
+								//save user into database
+								DAO.getInstance().begin();
+								DAO.getInstance().getSession().update(user);
+								DAO.getInstance().commit();
+							  
+								result = SharpCartConstants.RECORD_CREATED;
+								
+							} else
+							{
+								result = SharpCartConstants.USER_EXISTS_IN_DB_CODE;
+							}
+						} catch (NumberFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 				} else // user is in database but provided password is incorrect
 				{
 					result = SharpCartConstants.ACCESS_DENIED;
