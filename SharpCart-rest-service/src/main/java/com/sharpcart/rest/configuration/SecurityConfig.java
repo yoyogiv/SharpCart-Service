@@ -35,7 +35,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   	//allow anyone to try and login
   	http.authorizeUrls()
   		.antMatchers("/aggregators/user/login").anonymous();
-	 
+	
+  	//allow anyone to get unavailable items
+  	http.authorizeUrls()
+  		.antMatchers("/aggregators/groceryItems/unavailable").anonymous();
+  	
   	/*
 	//only authorized users can optimize a list
     http.authorizeUrls()
