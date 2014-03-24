@@ -2,6 +2,7 @@ package com.sharpcart.rest.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,9 +16,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   private UserDetailsService userDetailsService;
   
+  @Autowired
+  private AuthenticationProvider authenticationProvider;
+  
   @Override
   protected void registerAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-	  auth.userDetailsService(this.userDetailsService);
+	  //auth.userDetailsService(this.userDetailsService);
+	  auth.authenticationProvider(authenticationProvider);
   }
 
   @Override
