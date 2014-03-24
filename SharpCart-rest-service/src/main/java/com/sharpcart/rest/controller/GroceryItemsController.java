@@ -21,6 +21,7 @@ import com.sharpcart.rest.model.UserProfile;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
 import com.sharpcart.rest.persistence.model.ShoppingItem;
 import com.sharpcart.rest.persistence.model.Store;
+import com.sharpcart.rest.persistence.model.StoreItem;
 
 @Controller
 public class GroceryItemsController {
@@ -36,9 +37,9 @@ public class GroceryItemsController {
 	 */
     @RequestMapping(value="/aggregators/groceryItems/unavailable",method = RequestMethod.POST)
     @ResponseBody
-    public List<ShoppingItem> getUnavailableGroceryItems(@RequestParam(value="userName", required=true) String userName) {
+    public List<StoreItem> getUnavailableGroceryItems(@RequestParam(value="userName", required=true) String userName) {
     	
-    	List<ShoppingItem> unavilableItems = new ArrayList<ShoppingItem>();
+    	List<StoreItem> unavilableItems = new ArrayList<StoreItem>();
     	SharpCartUser user = null;
     	Query query;
     	
@@ -60,7 +61,7 @@ public class GroceryItemsController {
     	//Get all unavailable items for user stores
     	if (user!=null)
     	{
-    		List<ShoppingItem> tempStoreItems;
+    		List<StoreItem> tempStoreItems;
     		
     		for (Store store : user.getStores())
     		{
@@ -70,10 +71,18 @@ public class GroceryItemsController {
 	    			DAO.getInstance().begin();
 	    			query = DAO.getInstance().getSession().createQuery("from StoreItem where storeId = :storeId and price = 0");
 	    			query.setLong("storeId", store.getId());
-	    			tempStoreItems = (List<ShoppingItem>)query.list();
+	    			tempStoreItems = (List<StoreItem>)query.list();
 	    			DAO.getInstance().commit();
 	    			
-	    			unavilableItems.addAll(tempStoreItems);
+	    			//unavilableItems.addAll(tempStoreItems);
+	    			
+	    			
+	    			for (StoreItem item : tempStoreItems)
+	    			{
+	    				LOG.info("Item Name: "+item.getStore().getName());
+	    			}
+	    			
+	    			
     			} catch (HibernateException ex)
     			{
     				DAO.getInstance().rollback();
