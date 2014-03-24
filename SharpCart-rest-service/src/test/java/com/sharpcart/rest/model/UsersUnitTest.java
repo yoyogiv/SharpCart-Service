@@ -1,5 +1,6 @@
 package com.sharpcart.rest.model;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -9,6 +10,7 @@ import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.sharpcart.rest.dao.DAO;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
 import com.sharpcart.rest.persistence.model.Store;
 
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.*;
+import static com.sharpcart.rest.dao.DAO.*;
 
 public class UsersUnitTest {
 
@@ -39,21 +42,13 @@ public class UsersUnitTest {
    */
   @Before
   public void setupUnitUnderTest() {
-		Configuration configuration = new AnnotationConfiguration ().configure();
-		StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().
-		applySettings(configuration.getProperties());
-		factory = configuration.buildSessionFactory(builder.build());
+	  try {
+		DAO.getInstance().begin();
 		
-		session = factory.openSession();
-		
-		//grab stores from database
-		session.beginTransaction();
-		
-		Query query = session.createQuery("from Store");
+		Query query = DAO.getInstance().getSession().createQuery("from Store");
 		List<Store> storeList = query.list();
 		
-		session.getTransaction().commit();
-		session.close();
+		DAO.getInstance().commit();
 		
 		for (Store store : storeList)
 		{
@@ -63,6 +58,12 @@ public class UsersUnitTest {
 				System.out.println("Store Name: "+store.getName());
 			}
 		}
+	  } catch (HibernateException ex)
+	  {
+		  DAO.getInstance().rollback();
+	  }
+	  
+	  DAO.getInstance().close();
   }
 
   /*
@@ -71,30 +72,29 @@ public class UsersUnitTest {
   @Test
   public void addNewUserToDatabase() {
 	  
-		  //init user
-		user = new SharpCartUser();
-		user.setUserName("testUser@gmail.com");
-		user.setPassword("123456");
-		user.setZip("78681");
-		user.setFamilySize("3");
-		user.setStores(stores);
+	  //init user
+	  user = new SharpCartUser();
+	  user.setUserName("testUser@gmail.com");
+	  user.setPassword("123456");
+	  user.setZip("78681");
+	  user.setFamilySize("3");
+	  user.setStores(stores);
 	
 	  //Save user to database
-	  session = factory.openSession();
-	  session.beginTransaction();
-	  session.save(user);
-	  session.getTransaction().commit();
+	  DAO.getInstance().begin();
+	  DAO.getInstance().getSession().save(user);
+	  DAO.getInstance().commit();
 	  
 	  //Validate that user was added
-	  session.beginTransaction();
-	  Query query = session.createQuery("from SharpCartUser where userName = :userName");
+	  DAO.getInstance().begin();
+	  Query query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
 	  query.setString("userName", "testUser@gmail.com");
 	  SharpCartUser user = (SharpCartUser)query.uniqueResult();
-	  session.getTransaction().commit();
+	  DAO.getInstance().commit();
 	  
 	  assertNotNull(user);
 	  
-	  session.close();
+	  DAO.getInstance().close();
 	  
 	  
   }
@@ -120,9 +120,8 @@ public class UsersUnitTest {
 		  stores.remove(storeToRemove);
 	  
 	  //Get user from Database
-	  session = factory.openSession();
-	  session.beginTransaction();
-	  Query query = session.createQuery("from SharpCartUser where userName = :userName");
+	  DAO.getInstance().begin();
+	  Query query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
 	  query.setString("userName", "testUser@gmail.com");
 	  SharpCartUser user = (SharpCartUser)query.uniqueResult();
 	  
@@ -130,20 +129,20 @@ public class UsersUnitTest {
 	  user.setStores(stores);
 	  
 	  //Update user in database
-	  session.update(user);
-	  session.getTransaction().commit();
+	  DAO.getInstance().getSession().update(user);
+	  DAO.getInstance().commit();
 	  
 	  //Validate that user no longer has removed store
-	  session.beginTransaction();
-	  query = session.createQuery("from SharpCartUser where userName = :userName");
+	  DAO.getInstance().begin();
+	  query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
 	  query.setString("userName", "testUser@gmail.com");
 	  user = (SharpCartUser)query.uniqueResult();
-	  session.getTransaction().commit();
+	  DAO.getInstance().commit();
 	  
 	  stores = user.getStores();
 	  assertFalse(stores.contains(storeToRemove));
 	  
-	  session.close();
+	  DAO.getInstance().close();
 
   }
   
@@ -153,34 +152,32 @@ public class UsersUnitTest {
   @Test
   public void removeUserFromDatabase() {
 	  //Get user from Database
-	  session = factory.openSession();
-	  
-	  session.beginTransaction();
-	  Query query = session.createQuery("from SharpCartUser where userName = :userName");
+	  DAO.getInstance().begin();
+	  Query query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
 	  query.setString("userName", "testUser@gmail.com");
 	  SharpCartUser user = (SharpCartUser)query.uniqueResult();
-	  session.getTransaction().commit();
+	  DAO.getInstance().commit();
 	  
 	  //Delte user from database
 	  if (user!=null)
 	  {
-		  session.beginTransaction();
-		  session.delete(user);
-		  session.getTransaction().commit();
+		  DAO.getInstance().begin();
+		  DAO.getInstance().getSession().delete(user);
+		  DAO.getInstance().commit();
 	  }
 	  
 	  //Check the user has been deleted
-	  session.beginTransaction();
-	  query = session.createQuery("from SharpCartUser where userName = :userName");
+	  DAO.getInstance().begin();
+	  query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
 	  query.setString("userName", "testUser@gmail.com");
 	  user = (SharpCartUser)query.uniqueResult();
-	  session.getTransaction().commit();
+	  DAO.getInstance().commit();
 	  
 	  //assert that user now equals null
 	  assertEquals(null, user);
 	  
 	  //close session
-	  session.close();
+	  DAO.getInstance().close();
 
   }
 }

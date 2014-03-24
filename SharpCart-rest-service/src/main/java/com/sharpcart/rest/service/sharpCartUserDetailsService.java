@@ -20,6 +20,7 @@ import com.sharpcart.rest.persistence.model.SharpCartUser;
 @Component ("userService")
 public class sharpCartUserDetailsService implements UserDetailsService {
 	private static Logger LOG = LoggerFactory.getLogger(sharpCartUserDetailsService.class);
+	
 	private SessionFactory factory;
 	private Session session;
 
@@ -44,6 +45,11 @@ public class sharpCartUserDetailsService implements UserDetailsService {
 		SharpCartUser user = (SharpCartUser)query.uniqueResult();
 		session.getTransaction().commit();
 		session.close();
+		
+		if (user==null)
+		{
+			throw new UsernameNotFoundException("User name not found");
+		}
 		
 		return new sharpCartUserDetails(user);
 	}
