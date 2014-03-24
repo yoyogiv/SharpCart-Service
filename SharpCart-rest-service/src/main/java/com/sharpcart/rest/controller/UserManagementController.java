@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.sharpcart.rest.dao.DAO;
 import com.sharpcart.rest.model.UserProfile;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
 import com.sharpcart.rest.persistence.model.Store;
@@ -36,15 +38,12 @@ import com.sharpcart.rest.utilities.SharpCartConstants;
 //@RequestMapping("/aggregators/user")
 public class UserManagementController {
     private static Logger LOG = LoggerFactory.getLogger(UserManagementController.class);
-	private Session session;
-	private SessionFactory factory;
 	
+    private Query query;
+    
 	public UserManagementController()
 	{
-		Configuration configuration = new AnnotationConfiguration ().configure();
-		StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().
-		applySettings(configuration.getProperties());
-		factory = configuration.buildSessionFactory(builder.build());
+		
 	}
 	
 	/*
@@ -55,6 +54,8 @@ public class UserManagementController {
     public String registerNewUser(@RequestBody final UserProfile jsonUser) {
     	
     	String result = SharpCartConstants.SERVER_ERROR_CODE;
+    	
+    	SharpCartUser user = null;
     	
     	//debug
     	LOG.info("User Name: "+jsonUser.getUserName()); //name
@@ -75,13 +76,17 @@ public class UserManagementController {
 		}
     	
     	//check if user already exits in the system
-	  	session = factory.openSession();
-		  
-	  	session.beginTransaction();
-	  	Query query = session.createQuery("from SharpCartUser where userName = :userName");
-	  	query.setString("userName", jsonUser.getUserName());
-	  	SharpCartUser user = (SharpCartUser)query.uniqueResult();
-	  	session.getTransaction().commit();
+    	try {
+	    	DAO.getInstance().begin();
+		  	query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
+		  	query.setString("userName", jsonUser.getUserName());
+		  	user = (SharpCartUser)query.uniqueResult();
+		  	DAO.getInstance().commit();
+    	} catch (HibernateException ex)
+    	{
+    		DAO.getInstance().rollback();
+    		ex.printStackTrace();
+    	}
 	  	
 	  	//if we have a user with the same user name in the database we return "exists"
 	  	if (user!=null)
@@ -103,36 +108,42 @@ public class UserManagementController {
 	  	  String stores[] = jsonUser.getStores().split("-");
 	  	  
 	  	  //grab stores from database
-	  	  session.beginTransaction();	
-	  	  query = session.createQuery("from Store");
-	  	  List<Store> storeList = query.list();	
-	  	  session.getTransaction().commit();
-		  
-	  	  Set<Store> userStores = new HashSet<Store>();
-	  	  
-	  	  for (String storeId : stores)
+	  	  try {
+		  	  DAO.getInstance().begin();
+		  	  query = DAO.getInstance().getSession().createQuery("from Store");
+		  	  List<Store> storeList = query.list();	
+		  	  DAO.getInstance().commit();
+			  
+		  	  Set<Store> userStores = new HashSet<Store>();
+		  	  
+		  	  for (String storeId : stores)
+		  	  {
+		  		  for (Store store : storeList)
+		  		  {
+		  			  if (store.getId()==Long.valueOf(storeId))
+		  			  {
+		  				  userStores.add(store);
+		  			  }
+		  		  }
+		  	  }
+		  	  
+		  	  persistanceUser.setStores(userStores);
+		  	  
+		  	  //save user into database
+		  	  DAO.getInstance().begin();
+			  DAO.getInstance().getSession().save(persistanceUser);
+			  DAO.getInstance().commit();
+			  
+			  result = SharpCartConstants.RECORD_CREATED;
+	  	  } catch (HibernateException ex)
 	  	  {
-	  		  for (Store store : storeList)
-	  		  {
-	  			  if (store.getId()==Long.valueOf(storeId))
-	  			  {
-	  				  userStores.add(store);
-	  			  }
-	  		  }
+	  		  DAO.getInstance().rollback();
+	  		  ex.printStackTrace();
 	  	  }
-	  	  
-	  	  persistanceUser.setStores(userStores);
-	  	  
-	  	  //save user into database
-	  	  session.beginTransaction();
-		  session.save(persistanceUser);
-		  session.getTransaction().commit();
-		  
-		  result = SharpCartConstants.RECORD_CREATED;
 	  	}
 	  	
 	  	//close session
-	  	session.close();
+	  	DAO.getInstance().close();
 	  	
 	  	//debug
     	LOG.info("Return Code: "+result); 
@@ -151,16 +162,23 @@ public class UserManagementController {
     						@RequestParam(value="password", required=true) String password) {
     	
     	String result = SharpCartConstants.ACCESS_DENIED;
-    	
+    	 SharpCartUser user = null;
+    	 
     	//Check if user name is in database
-	  	session = factory.openSession();
-		  
-	  	session.beginTransaction();
-	  	Query query = session.createQuery("from SharpCartUser where userName = :userName");
-	  	query.setString("userName", userName);
-	  	SharpCartUser user = (SharpCartUser)query.uniqueResult();
-	  	session.getTransaction().commit();
-	  	
+    	try {
+	    	DAO.getInstance().begin();
+		  	query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
+		  	query.setString("userName", userName);
+		  	user = (SharpCartUser)query.uniqueResult();
+		  	DAO.getInstance().commit();
+		  	
+		  	DAO.getInstance().close();
+    	} catch (HibernateException ex)
+    	{
+    		DAO.getInstance().rollback();
+    		ex.printStackTrace();
+    	}
+    	
 	  	//if the user doesnt exist in the database deny access
 	  	if (user==null)
 	  	{
@@ -197,6 +215,7 @@ public class UserManagementController {
     public String updateUser(@RequestBody final UserProfile jsonUser) {
     	
     	String result = SharpCartConstants.SERVER_ERROR_CODE;
+    	SharpCartUser user = null;
     	
     	//debug
     	LOG.info("User Name: "+jsonUser.getUserName()); //name
@@ -206,14 +225,18 @@ public class UserManagementController {
     	LOG.info("User Stores: "+jsonUser.getStores()); //stores
     	
     	//check if user already exits in the system
-	  	session = factory.openSession();
-		  
-	  	session.beginTransaction();
-	  	Query query = session.createQuery("from SharpCartUser where userName = :userName");
-	  	query.setString("userName", jsonUser.getUserName());
-	  	SharpCartUser user = (SharpCartUser)query.uniqueResult();
-	  	session.getTransaction().commit();
-	  	
+    	try {
+	    	DAO.getInstance().begin();
+		  	query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
+		  	query.setString("userName", jsonUser.getUserName());
+		  	user = (SharpCartUser)query.uniqueResult();
+		  	DAO.getInstance().commit(); 	
+    	} catch (HibernateException ex)
+    	{
+    		DAO.getInstance().rollback();
+    		ex.printStackTrace();
+    	}
+    	
 	  	//if we dont have the user in our database we return access denied
 	  	if (user==null)
 	  		result = SharpCartConstants.ACCESS_DENIED;
@@ -236,10 +259,10 @@ public class UserManagementController {
 				  		String stores[] = jsonUser.getStores().split("-");
 				  	  
 				  		//grab stores from database
-				  		session.beginTransaction();	
-				  		query = session.createQuery("from Store");
+				  		DAO.getInstance().begin();
+				  		query = DAO.getInstance().getSession().createQuery("from Store");
 				  		List<Store> storeList = query.list();	
-				  		session.getTransaction().commit();
+				  		DAO.getInstance().commit();
 					  
 				  		Set<Store> userStores = new HashSet<Store>();
 				  	  
@@ -257,9 +280,9 @@ public class UserManagementController {
 				  		user.setStores(userStores);
 				  	  
 				  		//save user into database
-				  		session.beginTransaction();
-				  		session.update(user);
-				  		session.getTransaction().commit();
+				  		DAO.getInstance().begin();
+				  		DAO.getInstance().getSession().update(user);
+				  		DAO.getInstance().commit();
 					  
 				  		result = SharpCartConstants.RECORD_CREATED;
 				} else // user is in database but provided password is incorrect
@@ -274,11 +297,15 @@ public class UserManagementController {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				result = SharpCartConstants.SERVER_ERROR_CODE;
+			} catch (HibernateException ex)
+			{
+				DAO.getInstance().rollback();
+				ex.printStackTrace();
 			}
 	  	}
 	  	
 	  	//close session
-	  	session.close();
+	  	DAO.getInstance().close();
 	  	
 	  	//debug
     	LOG.info("Return Code: "+result); 
