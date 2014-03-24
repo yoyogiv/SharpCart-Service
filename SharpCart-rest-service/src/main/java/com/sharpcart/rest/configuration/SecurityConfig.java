@@ -28,6 +28,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
 	
+    //allow anyone to register
+	http.authorizeUrls()
+	  	.antMatchers("/aggregators/user/register").anonymous();
+
+  	//allow anyone to try and login
+  	http.authorizeUrls()
+  		.antMatchers("/aggregators/user/login").anonymous();
+	 
+  	/*
 	//only authorized users can optimize a list
     http.authorizeUrls()
         .antMatchers("/aggregators/optimize").hasRole("USER")
@@ -41,13 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .anyRequest().anonymous()
         .and()
         .httpBasic();
+        */
     
-    //allow anyone to register
-    http.authorizeUrls()
-	    .antMatchers("/aggregators/user/register").anonymous();
-    
-    //allow anyone to try and login
-    http.authorizeUrls()
-    .antMatchers("/aggregators/user/login").anonymous();
+
   }
 }

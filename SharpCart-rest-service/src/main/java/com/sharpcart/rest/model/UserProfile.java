@@ -9,13 +9,14 @@ public class UserProfile {
 	private String familySize;
 	private String userName;
 	private String password;
-	private Date   lastUpdated;
+	private String lastUpdated;
 	
 	public UserProfile() {
 		zip = "";
 		familySize = "";
 		userName = "";
 		stores = "";
+		lastUpdated = "";
 	}
 
 	/**
@@ -216,14 +217,14 @@ public class UserProfile {
 	/**
 	 * @return the lastUpdated
 	 */
-	public Date getLastUpdated() {
+	public String getLastUpdated() {
 		return lastUpdated;
 	}
 
 	/**
 	 * @param lastUpdated the lastUpdated to set
 	 */
-	public void setLastUpdated(Date lastUpdated) {
+	public void setLastUpdated(String lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
 	

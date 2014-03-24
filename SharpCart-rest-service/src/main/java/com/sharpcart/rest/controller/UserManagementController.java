@@ -130,9 +130,9 @@ public class UserManagementController {
 		  	  
 		  	  persistanceUser.setStores(userStores);
 		  	  
-		  	  if (jsonUser.getLastUpdated().getTime()!=0)
+		  	  if (!jsonUser.getLastUpdated().equalsIgnoreCase("Jan 1, 1970 12:00:00 AM"))
 		  	  {
-		  		  persistanceUser.setLastUpdated(jsonUser.getLastUpdated());
+		  		  persistanceUser.setLastUpdated(new Date(jsonUser.getLastUpdated()));
 		  	  } else
 		  	  {
 		  		  persistanceUser.setLastUpdated(new Date());
