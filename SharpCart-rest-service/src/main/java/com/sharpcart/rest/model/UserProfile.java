@@ -1,5 +1,6 @@
 package com.sharpcart.rest.model;
 
+import java.util.Date;
 import java.util.Set;
 
 public class UserProfile {
@@ -8,6 +9,7 @@ public class UserProfile {
 	private String familySize;
 	private String userName;
 	private String password;
+	private Date   lastUpdated;
 	
 	public UserProfile() {
 		zip = "";
@@ -209,6 +211,20 @@ public class UserProfile {
 	 */
 	public void setPassword(final String password) {
 		this.password = password;
+	}
+
+	/**
+	 * @return the lastUpdated
+	 */
+	public Date getLastUpdated() {
+		return lastUpdated;
+	}
+
+	/**
+	 * @param lastUpdated the lastUpdated to set
+	 */
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 	
 }

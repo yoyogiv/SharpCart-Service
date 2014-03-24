@@ -1,5 +1,6 @@
 package com.sharpcart.rest.persistence.model;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ public class SharpCartUser {
 	
 	private String password;
 	
+	private Date	lastUpdated;
 	
 	/**
 	 * @param stores
@@ -43,7 +45,7 @@ public class SharpCartUser {
 		this.familySize = familySize;
 		this.userName = userName;
 		this.password = password;
-		this.stores = new HashSet<Store>();
+		//this.stores = new HashSet<Store>();
 	}
 
 	public SharpCartUser()
@@ -135,5 +137,20 @@ public class SharpCartUser {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	/**
+	 * @return the lastUpdated
+	 */
+	public Date getLastUpdated() {
+		return lastUpdated;
+	}
+
+	/**
+	 * @param lastUpdated the lastUpdated to set
+	 */
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+	
 	
 }

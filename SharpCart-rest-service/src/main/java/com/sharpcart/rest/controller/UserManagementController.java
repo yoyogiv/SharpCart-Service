@@ -2,6 +2,7 @@ package com.sharpcart.rest.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -129,6 +130,13 @@ public class UserManagementController {
 		  	  
 		  	  persistanceUser.setStores(userStores);
 		  	  
+		  	  if (jsonUser.getLastUpdated().getTime()!=0)
+		  	  {
+		  		  persistanceUser.setLastUpdated(jsonUser.getLastUpdated());
+		  	  } else
+		  	  {
+		  		  persistanceUser.setLastUpdated(new Date());
+		  	  }
 		  	  //save user into database
 		  	  DAO.getInstance().begin();
 			  DAO.getInstance().getSession().save(persistanceUser);
@@ -208,7 +216,7 @@ public class UserManagementController {
     }
     
 	/*
-	 * Register a new user
+	 * Update a user
 	 */
     @RequestMapping(value="/aggregators/user/update",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -300,6 +308,7 @@ public class UserManagementController {
 			} catch (HibernateException ex)
 			{
 				DAO.getInstance().rollback();
+				result = SharpCartConstants.SERVER_ERROR_CODE;
 				ex.printStackTrace();
 			}
 	  	}

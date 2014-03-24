@@ -15,6 +15,7 @@ import com.sharpcart.rest.persistence.model.SharpCartUser;
 import com.sharpcart.rest.persistence.model.Store;
 
 import java.nio.channels.SeekableByteChannel;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,6 +80,7 @@ public class UsersUnitTest {
 	  user.setZip("78681");
 	  user.setFamilySize("3");
 	  user.setStores(stores);
+	  user.setLastUpdated(new Date());
 	
 	  //Save user to database
 	  DAO.getInstance().begin();
@@ -127,6 +129,8 @@ public class UsersUnitTest {
 	  
 	  //Update user stores
 	  user.setStores(stores);
+	  
+	  user.setLastUpdated(new Date());
 	  
 	  //Update user in database
 	  DAO.getInstance().getSession().update(user);
