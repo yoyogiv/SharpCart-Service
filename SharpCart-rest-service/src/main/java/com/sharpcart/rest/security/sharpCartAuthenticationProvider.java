@@ -1,25 +1,13 @@
 package com.sharpcart.rest.security;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,19 +17,13 @@ import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.authentication.encoding.PlaintextPasswordEncoder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.sharpcart.rest.dao.DAO;
 import com.sharpcart.rest.model.sharpCartUserDetails;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
-import com.sharpcart.rest.service.sharpCartUserDetailsService;
 import com.sharpcart.rest.utilities.PasswordHash;
-import com.sharpcart.rest.utilities.SharpCartConstants;
 
 public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
@@ -95,11 +77,11 @@ public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenti
 		//Find user in database
 		try {
 			DAO.getInstance().begin();
-			Query query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
+			final Query query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
 			query.setString("userName", name);
 			user = (SharpCartUser)query.uniqueResult();
 			DAO.getInstance().commit();
-		} catch (HibernateException ex)
+		} catch (final HibernateException ex)
 		{
 			DAO.getInstance().rollback();
 			ex.printStackTrace();
@@ -125,13 +107,13 @@ public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenti
 		            // temporary - the idea here is to generate the not authorized exception - not by hand, but by returning wrong credentials which in turn will be refused later
 		            return new org.springframework.security.core.userdetails.User("wrongUsername", "wrongPass", new ArrayList<GrantedAuthority>());
 				}
-			} catch (NoSuchAlgorithmException e) {
+			} catch (final NoSuchAlgorithmException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 	            // temporary - the idea here is to generate the not authorized exception - not by hand, but by returning wrong credentials which in turn will be refused later
 	            return new org.springframework.security.core.userdetails.User("wrongUsername", "wrongPass", new ArrayList<GrantedAuthority>());
 				
-			} catch (InvalidKeySpecException e) {
+			} catch (final InvalidKeySpecException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 	            // temporary - the idea here is to generate the not authorized exception - not by hand, but by returning wrong credentials which in turn will be refused later

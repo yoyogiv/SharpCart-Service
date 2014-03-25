@@ -1,7 +1,6 @@
 package com.sharpcart.rest.controller;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -9,22 +8,18 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sharpcart.rest.dao.DAO;
-import com.sharpcart.rest.model.UserProfile;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
 import com.sharpcart.rest.persistence.model.ShoppingItem;
 import com.sharpcart.rest.persistence.model.Store;
 import com.sharpcart.rest.persistence.model.StoreItem;
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 @Controller
 public class GroceryItemsController {
@@ -42,8 +37,8 @@ public class GroceryItemsController {
     @ResponseBody
     public List<ShoppingItem> getUnavailableGroceryItems(@RequestParam(value="userName", required=true) String userName) {
     	
-    	ArrayList<ShoppingItem> unavilableItems = new ArrayList<ShoppingItem>();
-    	ArrayList<ShoppingItem> unavilableItemsCleaned = new ArrayList<ShoppingItem>();
+    	final ArrayList<ShoppingItem> unavilableItems = new ArrayList<ShoppingItem>();
+    	final ArrayList<ShoppingItem> unavilableItemsCleaned = new ArrayList<ShoppingItem>();
     	
     	SharpCartUser user = null;
     	Query query;
@@ -55,7 +50,7 @@ public class GroceryItemsController {
 	  	  	query.setString("userName", userName);
 	  	  	user = (SharpCartUser)query.uniqueResult();
 	  	  	DAO.getInstance().commit();
-    	} catch (HibernateException ex)
+    	} catch (final HibernateException ex)
     	{
     		DAO.getInstance().rollback();
     		ex.printStackTrace();
@@ -67,24 +62,22 @@ public class GroceryItemsController {
     	if (user!=null)
     	{
     		List<StoreItem> tempStoreItems;
-    		int numberOfStores = user.getStores().size();
+    		final int numberOfStores = user.getStores().size();
     		
-    		for (Store store : user.getStores())
-    		{
-    			LOG.info("Store Id: "+store.getId());
-    			
+    		for (final Store store : user.getStores())
+    		{ 			
     			try {
 	    			DAO.getInstance().begin();
 	    			query = DAO.getInstance().getSession().createQuery("from StoreItem where storeId = :storeId and price = 0");
 	    			query.setLong("storeId", store.getId());
-	    			tempStoreItems = (List<StoreItem>)query.list();
+	    			tempStoreItems = query.list();
 	    			DAO.getInstance().commit();
 	    					
-	    			for (StoreItem item : tempStoreItems)
+	    			for (final StoreItem item : tempStoreItems)
 	    			{
 	    				unavilableItems.add(item.getShoppingItem());
 	    			}   			
-    			} catch (HibernateException ex)
+    			} catch (final HibernateException ex)
     			{
     				DAO.getInstance().rollback();
     				ex.printStackTrace();
@@ -97,13 +90,13 @@ public class GroceryItemsController {
     		int index = 0;
     		for (int i=0;i<unavilableItems.size()-1;i++)
     		{
-    			if(((ShoppingItem)unavilableItems.get(i)).getId() == ((ShoppingItem)unavilableItems.get(i+1)).getId())
+    			if(unavilableItems.get(i).getId() == unavilableItems.get(i+1).getId())
     				index++;
     			else
     				index=0;
     			
     			if (index==numberOfStores-1)
-    				unavilableItemsCleaned.add((ShoppingItem)unavilableItems.get(i));
+    				unavilableItemsCleaned.add(unavilableItems.get(i));
     		}
     	}
     	

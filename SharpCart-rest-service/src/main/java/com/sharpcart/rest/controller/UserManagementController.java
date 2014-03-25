@@ -11,24 +11,15 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.sharpcart.rest.dao.DAO;
 import com.sharpcart.rest.model.UserProfile;
@@ -70,10 +61,10 @@ public class UserManagementController {
     	//hash user password
     	try {
     		jsonUser.setPassword(PasswordHash.createHash(jsonUser.getPassword()));
-		} catch (NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InvalidKeySpecException e) {
+		} catch (final InvalidKeySpecException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -85,7 +76,7 @@ public class UserManagementController {
 		  	query.setString("userName", jsonUser.getUserName());
 		  	user = (SharpCartUser)query.uniqueResult();
 		  	DAO.getInstance().commit();
-    	} catch (HibernateException ex)
+    	} catch (final HibernateException ex)
     	{
     		DAO.getInstance().rollback();
     		ex.printStackTrace();
@@ -101,27 +92,27 @@ public class UserManagementController {
 	  	   * In order to be able to save the JSON user in the database we need to convert it
 	  	   * to our persistence user model
 	  	   */
-	  	  SharpCartUser persistanceUser = new SharpCartUser();
+	  	  final SharpCartUser persistanceUser = new SharpCartUser();
 	  	  persistanceUser.setUserName(jsonUser.getUserName());
 	  	  persistanceUser.setPassword(jsonUser.getPassword());
 	  	  persistanceUser.setZip(jsonUser.getZip());
 	  	  persistanceUser.setFamilySize(jsonUser.getFamilySize());
 	  	  
 	  	  //Convert the JSON stores string to a set of store objects
-	  	  String stores[] = jsonUser.getStores().split("-");
+	  	  final String stores[] = jsonUser.getStores().split("-");
 	  	  
 	  	  //grab stores from database
 	  	  try {
 		  	  DAO.getInstance().begin();
 		  	  query = DAO.getInstance().getSession().createQuery("from Store");
-		  	  List<Store> storeList = query.list();	
+		  	  final List<Store> storeList = query.list();	
 		  	  DAO.getInstance().commit();
 			  
-		  	  Set<Store> userStores = new HashSet<Store>();
+		  	  final Set<Store> userStores = new HashSet<Store>();
 		  	  
-		  	  for (String storeId : stores)
+		  	  for (final String storeId : stores)
 		  	  {
-		  		  for (Store store : storeList)
+		  		  for (final Store store : storeList)
 		  		  {
 		  			  if (store.getId()==Long.valueOf(storeId))
 		  			  {
@@ -136,7 +127,7 @@ public class UserManagementController {
 		  	  {
 		  		  try {
 					persistanceUser.setLastUpdated(DateFormat.getDateInstance().parse(jsonUser.getLastUpdated()));
-				} catch (ParseException e) {
+				} catch (final ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -151,7 +142,7 @@ public class UserManagementController {
 			  DAO.getInstance().commit();
 			  
 			  result = SharpCartConstants.RECORD_CREATED;
-	  	  } catch (HibernateException ex)
+	  	  } catch (final HibernateException ex)
 	  	  {
 	  		  DAO.getInstance().rollback();
 	  		  ex.printStackTrace();
@@ -189,7 +180,7 @@ public class UserManagementController {
 		  	DAO.getInstance().commit();
 		  	
 		  	DAO.getInstance().close();
-    	} catch (HibernateException ex)
+    	} catch (final HibernateException ex)
     	{
     		DAO.getInstance().rollback();
     		ex.printStackTrace();
@@ -209,11 +200,11 @@ public class UserManagementController {
 				{
 					result = SharpCartConstants.USER_EXISTS_IN_DB_CODE;
 				}
-			} catch (NoSuchAlgorithmException e) {
+			} catch (final NoSuchAlgorithmException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				result = SharpCartConstants.SERVER_ERROR_CODE;
-			} catch (InvalidKeySpecException e) {
+			} catch (final InvalidKeySpecException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				result = SharpCartConstants.SERVER_ERROR_CODE;
@@ -247,7 +238,7 @@ public class UserManagementController {
 		  	query.setString("userName", jsonUser.getUserName());
 		  	user = (SharpCartUser)query.uniqueResult();
 		  	DAO.getInstance().commit(); 	
-    	} catch (HibernateException ex)
+    	} catch (final HibernateException ex)
     	{
     		DAO.getInstance().rollback();
     		ex.printStackTrace();
@@ -276,19 +267,19 @@ public class UserManagementController {
 								user.setFamilySize(jsonUser.getFamilySize());
 							  
 								//Convert the JSON stores string to a set of store objects
-								String stores[] = jsonUser.getStores().split("-");
+								final String stores[] = jsonUser.getStores().split("-");
 							  
 								//grab stores from database
 								DAO.getInstance().begin();
 								query = DAO.getInstance().getSession().createQuery("from Store");
-								List<Store> storeList = query.list();	
+								final List<Store> storeList = query.list();	
 								DAO.getInstance().commit();
 							  
-								Set<Store> userStores = new HashSet<Store>();
+								final Set<Store> userStores = new HashSet<Store>();
 							  
-								for (String storeId : stores)
+								for (final String storeId : stores)
 								{
-									for (Store store : storeList)
+									for (final Store store : storeList)
 									{
 									  if (store.getId()==Long.valueOf(storeId))
 									  {
@@ -312,10 +303,10 @@ public class UserManagementController {
 							{
 								result = SharpCartConstants.USER_EXISTS_IN_DB_CODE;
 							}
-						} catch (NumberFormatException e) {
+						} catch (final NumberFormatException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						} catch (ParseException e) {
+						} catch (final ParseException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
@@ -323,15 +314,15 @@ public class UserManagementController {
 				{
 					result = SharpCartConstants.ACCESS_DENIED;
 				}
-			} catch (NoSuchAlgorithmException e) {
+			} catch (final NoSuchAlgorithmException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				result = SharpCartConstants.SERVER_ERROR_CODE;
-			} catch (InvalidKeySpecException e) {
+			} catch (final InvalidKeySpecException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				result = SharpCartConstants.SERVER_ERROR_CODE;
-			} catch (HibernateException ex)
+			} catch (final HibernateException ex)
 			{
 				DAO.getInstance().rollback();
 				result = SharpCartConstants.SERVER_ERROR_CODE;

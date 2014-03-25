@@ -20,8 +20,8 @@ public class DAO {
     private static final DAO instance = new DAO();
     
     private DAO() {
-		Configuration configuration = new AnnotationConfiguration ().configure();
-		StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().
+		final Configuration configuration = new AnnotationConfiguration ().configure();
+		final StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder().
 		applySettings(configuration.getProperties());
 		sessionFactory = configuration.buildSessionFactory(builder.build());
     }
@@ -31,7 +31,7 @@ public class DAO {
     }
     
     public Session getSession() {
-        Session session = (Session) DAO.session.get();
+        Session session = DAO.session.get();
         if (session == null) {
             session = sessionFactory.openSession();
             DAO.session.set(session);
@@ -51,13 +51,13 @@ public class DAO {
     public void rollback() {
         try {
             getSession().getTransaction().rollback();
-        } catch (HibernateException e) {
+        } catch (final HibernateException e) {
             log.log(Level.WARNING, "Cannot rollback", e);
         }
 
         try {
             getSession().close();
-        } catch (HibernateException e) {
+        } catch (final HibernateException e) {
             log.log(Level.WARNING, "Cannot close", e);
         }
         

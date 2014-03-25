@@ -2,11 +2,6 @@ package com.sharpcart.rest.service;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import com.sharpcart.rest.controller.UserManagementController;
 import com.sharpcart.rest.dao.DAO;
 import com.sharpcart.rest.model.sharpCartUserDetails;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
@@ -34,11 +28,11 @@ public class sharpCartUserDetailsService implements UserDetailsService {
 		//Find user in database
 		try {
 			DAO.getInstance().begin();
-			Query query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
+			final Query query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
 			query.setString("userName", username);
 			user = (SharpCartUser)query.uniqueResult();
 			DAO.getInstance().commit();
-		} catch (HibernateException ex)
+		} catch (final HibernateException ex)
 		{
 			DAO.getInstance().rollback();
 			ex.printStackTrace();

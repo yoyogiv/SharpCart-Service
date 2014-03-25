@@ -1,6 +1,5 @@
 package com.sharpcart.rest.model;
 
-import java.util.Date;
 import java.util.Set;
 
 public class UserProfile {

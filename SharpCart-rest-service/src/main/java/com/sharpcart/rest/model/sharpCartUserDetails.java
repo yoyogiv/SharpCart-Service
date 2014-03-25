@@ -7,7 +7,6 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.sharpcart.rest.persistence.model.SharpCartUser;
@@ -20,9 +19,9 @@ public class sharpCartUserDetails implements UserDetails {
 
 	public static final String ROLE_USER = "USER";
 
-	private Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+	private final Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
 	
-	private SharpCartUser user;
+	private final SharpCartUser user;
 	
 	/*
 	 * A constructor that accepts a SharpCartUser
@@ -33,7 +32,7 @@ public class sharpCartUserDetails implements UserDetails {
 		this.user = user;
 		
 		//create a simple granted authority for each of our authorities and add it to the list of granted authorities
-		for (String ga : Arrays.asList(ROLE_USER, SCOPE_READ, SCOPE_WRITE))
+		for (final String ga : Arrays.asList(ROLE_USER, SCOPE_READ, SCOPE_WRITE))
 		{
 			grantedAuthorities.add(new SimpleGrantedAuthority(ga));
 		}
