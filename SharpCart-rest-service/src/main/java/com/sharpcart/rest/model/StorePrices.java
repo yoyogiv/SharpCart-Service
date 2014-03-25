@@ -8,7 +8,7 @@ public class StorePrices {
     private List<ShoppingListItem> items;
     private double total_cost;
     private String store_image_location;
-    private int id;
+    private Long id;
     private int status;
 
     /**
@@ -70,14 +70,14 @@ public class StorePrices {
 	/**
 	 * @return the id
 	 */
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(final int id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 

@@ -43,7 +43,7 @@ public class GroceryItemsController {
     	SharpCartUser user = null;
     	Query query;
     	
-    	//Get list of stores for user
+    	//Get user from database
     	try {
   	  	DAO.getInstance().begin();
 	  	  	query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");

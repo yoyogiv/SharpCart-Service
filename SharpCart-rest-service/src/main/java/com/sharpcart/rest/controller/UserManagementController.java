@@ -219,17 +219,20 @@ public class UserManagementController {
 	 */
     @RequestMapping(value="/aggregators/user/update",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String updateUser(@RequestBody final UserProfile jsonUser) {
+    public UserProfile updateUser(@RequestBody final UserProfile jsonUser) {
     	
     	String result = SharpCartConstants.SERVER_ERROR_CODE;
     	SharpCartUser user = null;
+    	UserProfile updatedJsonUser = new UserProfile();
     	
     	//debug
+    	/*
     	LOG.info("User Name: "+jsonUser.getUserName()); //name
     	LOG.info("User Password: "+jsonUser.getPassword()); //password
     	LOG.info("User Zip: "+jsonUser.getZip()); //zip
     	LOG.info("User Family Size: "+jsonUser.getFamilySize()); //family size
     	LOG.info("User Stores: "+jsonUser.getStores()); //stores
+    	*/
     	
     	//check if user already exits in the system
     	try {
@@ -296,12 +299,28 @@ public class UserManagementController {
 								DAO.getInstance().begin();
 								DAO.getInstance().getSession().update(user);
 								DAO.getInstance().commit();
-							  
-								result = SharpCartConstants.RECORD_CREATED;
 								
-							} else
+								//since the device profile is newer we return it back to the device
+								updatedJsonUser = jsonUser;
+								
+							} else //the information in the database is newer so we need to update the device
 							{
-								result = SharpCartConstants.USER_EXISTS_IN_DB_CODE;
+								updatedJsonUser.setUserName(user.getUserName());
+								updatedJsonUser.setPassword("");
+								updatedJsonUser.setZip(user.getZip());
+								updatedJsonUser.setFamilySize(user.getFamilySize());
+								
+								String userStoresIdString = "";
+								
+								for (Store store : user.getStores())
+								{
+									userStoresIdString+=Long.valueOf(store.getId())+"-";
+								}
+								
+								//remove last "-"
+								userStoresIdString = userStoresIdString.substring(0, userStoresIdString.lastIndexOf("-"));
+								
+								updatedJsonUser.setStores(userStoresIdString);
 							}
 						} catch (final NumberFormatException e) {
 							// TODO Auto-generated catch block
@@ -331,11 +350,8 @@ public class UserManagementController {
 	  	}
 	  	
 	  	//close session
-	  	DAO.getInstance().close();
-	  	
-	  	//debug
-    	LOG.info("Return Code: "+result); 
+	  	DAO.getInstance().close();  	
     	
-    	return result;
+    	return updatedJsonUser;
     }
 }
