@@ -75,6 +75,8 @@ public class OptimizeSharpListController {
 	    		
 	    		Assert.notNull(sharpList.getMainSharpList(),"optimization can not work without a valid list of grocery items");
 	    		
+	    		//remove all extra items not in the database
+	    		
 	    		for (ShoppingListItem item : sharpList.getMainSharpList())
 	    		{
 	    			//debug
@@ -130,7 +132,7 @@ public class OptimizeSharpListController {
 		    	    	shoppingListItem.setConversion_ratio(storeItem.getShoppingItem().getUnitToItemConversionRatio());
 		    	    	shoppingListItem.setImage_location(storeItem.getShoppingItem().getImageLocation());
 		    	    	
-		    	    	//quantity 
+		    	    	//user list specific quantities
 		    	    	shoppingListItem.setQuantity(item.getQuantity());
 		    	    	
 		    	    	//price related information
@@ -138,8 +140,31 @@ public class OptimizeSharpListController {
 		    	    	shoppingListItem.setPackage_quantity(storeItem.getQuantity());
 		    	    	if (storeItem.getPrice()>0)
 		    	    		shoppingListItem.setPrice_per_unit(storeItem.getPrice()/storeItem.getQuantity());
-		    	    	shoppingListItem.setTotal_price(storeItem.getPrice()*item.getQuantity());
 		    	    	
+		    	    	//get prices for items on sale
+		    	    	
+		    	    	//calculate total cost
+		    	    	if ((storeItem.getPrice()!=0)&&(storeItem.getQuantity()!=0))
+		    	    	{
+		    	    		if (item.getQuantity()<=storeItem.getQuantity())
+		    	    		{
+		    	    			shoppingListItem.setTotal_price(storeItem.getPrice());
+		    	    			shoppingListItem.setQuantity(storeItem.getQuantity());
+		    	    		} else
+		    	    		{
+		    	    			shoppingListItem.setTotal_price((item.getQuantity()/storeItem.getQuantity())*storeItem.getPrice());
+		    	    			
+		    	    			/* if user quantity has a reminder when dividing by item package quantity, we add one more package
+		    	    			 * since you cant buy a fraction of a package
+		    	    			 */
+		    	    			 if ((item.getQuantity()%storeItem.getQuantity())!=0)
+		    	    			 {
+		    	    				 shoppingListItem.setTotal_price(shoppingListItem.getTotal_price()+storeItem.getPrice());
+		    	    				 shoppingListItem.setQuantity(Math.floor(((item.getQuantity()/storeItem.getQuantity())+1)*storeItem.getQuantity()));
+		    	    			 }
+		    	    		}
+		    	    	}
+
 		    	    	//add item to store prices grocery items list
 		    	    	groceryItems.add(shoppingListItem);
 		    	    	
