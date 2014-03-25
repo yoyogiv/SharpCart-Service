@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,6 +52,11 @@ public class OptimizeSharpListController {
     		ex.printStackTrace();
     	}
     	
+    	Assert.notNull(user,"optimization can not work without a valid user object");
+    	
+    	//debug
+    	LOG.info("User Name: "+user.getUserName());
+    	
     	if (user!=null)
     	{
     		stores = user.getStores();
@@ -67,12 +73,17 @@ public class OptimizeSharpListController {
 	    		//get prices for items
 	    		List<ShoppingListItem> groceryItems = new ArrayList<ShoppingListItem>();
 	    		
+	    		Assert.notNull(sharpList.getMainSharpList(),"optimization can not work without a valid list of grocery items");
+	    		
 	    		for (ShoppingListItem item : sharpList.getMainSharpList())
 	    		{
-	    			StoreItem storeItem = null;
+	    			//debug
+	    	    	LOG.info("Main sharp list item id: "+item.getId());
+	    	    	
+	    			StoreItem storeItem = new StoreItem();
 	    	    	try {
 		    	  	  	DAO.getInstance().begin();
-		    		  	query = DAO.getInstance().getSession().createQuery("from StoreItem where id = :storeId and shoppingItemId = :shoppingItemId");
+		    		  	query = DAO.getInstance().getSession().createQuery("from StoreItem where storeId = :storeId and shoppingItemId = :shoppingItemId");
 		    		  	query.setLong("storeId", store.getId());
 		    		  	query.setLong("shoppingItemId",item.getId());
 		    		  	storeItem = (StoreItem)query.uniqueResult();
@@ -82,6 +93,10 @@ public class OptimizeSharpListController {
 	    	    		DAO.getInstance().rollback();
 	    	    		ex.printStackTrace();
 	    	    	}
+	    	    	
+	    	    	//debug
+	    	    	LOG.info("Store item id: "+storeItem.getId());
+
 	    	    	
 	    	    	if (storeItem!=null)
 	    	    	{
@@ -142,8 +157,6 @@ public class OptimizeSharpListController {
 	    	    	
 	    	    	storePrices.setTotal_cost(totalCost);
 	    		}
-	    		
-	    		
 	    		
 	    		//add to optimized list
 	    		optimizedSharpList.add(storePrices);
