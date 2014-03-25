@@ -75,12 +75,10 @@ public class OptimizeSharpListController {
 	    		
 	    		Assert.notNull(sharpList.getMainSharpList(),"optimization can not work without a valid list of grocery items");
 	    		
-	    		//remove all extra items not in the database
-	    		
 	    		for (ShoppingListItem item : sharpList.getMainSharpList())
 	    		{
 	    			//debug
-	    	    	LOG.info("Main sharp list item id: "+item.getId());
+	    	    	LOG.debug("Main sharp list item id: "+item.getId());
 	    	    	
 	    			StoreItem storeItem = new StoreItem();
 	    	    	try {
@@ -97,7 +95,8 @@ public class OptimizeSharpListController {
 	    	    	}
 	    	    	
 	    	    	//debug
-	    	    	LOG.info("Store item id: "+storeItem.getId());
+	    	    	if (storeItem!=null)
+	    	    		LOG.debug("Store item id: "+storeItem.getId());
 
 	    	    	
 	    	    	if (storeItem!=null)
