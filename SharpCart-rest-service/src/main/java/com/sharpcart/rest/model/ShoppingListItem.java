@@ -1,15 +1,15 @@
 package com.sharpcart.rest.model;
 
 public class ShoppingListItem implements Comparable<ShoppingListItem> {
-    private int id;
+    private Long id;
     private String name;
     private double price_per_unit;
     private double quantity;
     private String unit;
     private String category;
     private String description;
-    private int shopping_item_category_id;
-    private int shopping_item_unit_id;
+    private Long shopping_item_category_id;
+    private Long shopping_item_unit_id;
     private double conversion_ratio;
     private double price;
     private double total_price;
@@ -36,14 +36,14 @@ public class ShoppingListItem implements Comparable<ShoppingListItem> {
 	/**
 	 * @return the id
 	 */
-	public int getId() {
+	public Long getId() {
 		return id;
 	}
 
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(final int id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -134,28 +134,28 @@ public class ShoppingListItem implements Comparable<ShoppingListItem> {
 	/**
 	 * @return the shopping_item_category_id
 	 */
-	public int getShopping_item_category_id() {
+	public Long getShopping_item_category_id() {
 		return shopping_item_category_id;
 	}
 
 	/**
 	 * @param shopping_item_category_id the shopping_item_category_id to set
 	 */
-	public void setShopping_item_category_id(final int shopping_item_category_id) {
+	public void setShopping_item_category_id(final Long shopping_item_category_id) {
 		this.shopping_item_category_id = shopping_item_category_id;
 	}
 
 	/**
 	 * @return the shopping_item_unit_id
 	 */
-	public int getShopping_item_unit_id() {
+	public Long getShopping_item_unit_id() {
 		return shopping_item_unit_id;
 	}
 
 	/**
 	 * @param shopping_item_unit_id the shopping_item_unit_id to set
 	 */
-	public void setShopping_item_unit_id(final int shopping_item_unit_id) {
+	public void setShopping_item_unit_id(final Long shopping_item_unit_id) {
 		this.shopping_item_unit_id = shopping_item_unit_id;
 	}
 

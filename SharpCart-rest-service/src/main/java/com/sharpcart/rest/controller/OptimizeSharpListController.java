@@ -59,6 +59,7 @@ public class OptimizeSharpListController {
 	    	for (Store store : stores)
 	    	{
 	    		StorePrices storePrices = new StorePrices();
+	    		
 	    		storePrices.setId(store.getId());
 	    		storePrices.setName(store.getName());
 	    		storePrices.setStore_image_location(store.getImageLocation());
@@ -68,7 +69,7 @@ public class OptimizeSharpListController {
 	    		
 	    		for (ShoppingListItem item : sharpList.getMainSharpList())
 	    		{
-	    			StoreItem storeItem;
+	    			StoreItem storeItem = null;
 	    	    	try {
 		    	  	  	DAO.getInstance().begin();
 		    		  	query = DAO.getInstance().getSession().createQuery("from StoreItem where id = :storeId and shoppingItemId = :shoppingItemId");
@@ -82,12 +83,67 @@ public class OptimizeSharpListController {
 	    	    		ex.printStackTrace();
 	    	    	}
 	    	    	
-	    	    	//Now that we have the store item we can generate our ShoppingListItem from it
-	    	    	ShoppingListItem shoppingListItem = new ShoppingListItem();
+	    	    	if (storeItem!=null)
+	    	    	{
+		    	    	//Now that we have the store item we can generate our ShoppingListItem from it
+		    	    	ShoppingListItem shoppingListItem = new ShoppingListItem();
+		    	    	/*
+		    	    	 * Id
+		    	    	 * Name
+		    	    	 * Description
+		    	    	 * Unit name
+		    	    	 * Unit id
+		    	    	 * Category name
+		    	    	 * Category id
+		    	    	 * Conversion Ratio
+		    	    	 * Image Location
+		    	    	 * Quantity
+		    	    	 * 
+		    	    	 * Price
+		    	    	 * Package quantity
+		    	    	 * Price per unit
+		    	    	 * Total price
+		    	    	 * 
+		    	    	 */
+		    	    	shoppingListItem.setId(storeItem.getShoppingItem().getId());
+		    	    	shoppingListItem.setName(storeItem.getShoppingItem().getName());
+		    	    	shoppingListItem.setDescription(storeItem.getShoppingItem().getDescription());
+		    	    	shoppingListItem.setUnit(storeItem.getShoppingItem().getUnit().getName());
+		    	    	shoppingListItem.setShopping_item_unit_id(storeItem.getShoppingItem().getUnit().getId());
+		    	    	shoppingListItem.setCategory(storeItem.getShoppingItem().getCategory().getName());
+		    	    	shoppingListItem.setShopping_item_category_id(storeItem.getShoppingItem().getCategory().getId());
+		    	    	shoppingListItem.setConversion_ratio(storeItem.getShoppingItem().getUnitToItemConversionRatio());
+		    	    	shoppingListItem.setImage_location(storeItem.getShoppingItem().getImageLocation());
+		    	    	
+		    	    	//quantity 
+		    	    	shoppingListItem.setQuantity(item.getQuantity());
+		    	    	
+		    	    	//price related information
+		    	    	shoppingListItem.setPrice(storeItem.getPrice());
+		    	    	shoppingListItem.setPackage_quantity(storeItem.getQuantity());
+		    	    	if (storeItem.getPrice()>0)
+		    	    		shoppingListItem.setPrice_per_unit(storeItem.getPrice()/storeItem.getQuantity());
+		    	    	shoppingListItem.setTotal_price(storeItem.getPrice()*item.getQuantity());
+		    	    	
+		    	    	//add item to store prices grocery items list
+		    	    	groceryItems.add(shoppingListItem);
+		    	    	
+	    	    	}
 	    	    	
+	    	    	//add list of grocery items to store prices object
+	    	    	storePrices.setItems(groceryItems);
+	    	    	
+	    	    	//calculate total cost
+	    	    	float totalCost = 0;
+	    	    	for (ShoppingListItem groceryItem : groceryItems)
+	    	    	{
+	    	    		totalCost+=groceryItem.getTotal_price();
+	    	    	}
+	    	    	
+	    	    	storePrices.setTotal_cost(totalCost);
 	    		}
 	    		
-	    		//calculate total cost
+	    		
 	    		
 	    		//add to optimized list
 	    		optimizedSharpList.add(storePrices);
