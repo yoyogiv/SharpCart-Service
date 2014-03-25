@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="ShoppingItem")
 
-public class ShoppingItem {
+public class ShoppingItem implements Comparable<ShoppingItem>{
 	private Long id;
 
 	private String name;
@@ -151,6 +151,11 @@ public class ShoppingItem {
 	 */
 	public void setUnitToItemConversionRatio(float unitToItemConversionRatio) {
 		this.unitToItemConversionRatio = unitToItemConversionRatio;
+	}
+
+	@Override
+	public int compareTo(ShoppingItem o) {
+		return this.id.compareTo(o.getId());
 	}
 	
 	
