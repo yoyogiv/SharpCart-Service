@@ -1,4 +1,4 @@
-package com.sharpcart.rest.service;
+package com.sharpcart.rest.security;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -10,13 +10,17 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import com.sharpcart.rest.dao.DAO;
-import com.sharpcart.rest.model.sharpCartUserDetails;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
 
 @Component
 public class sharpCartUserDetailsService implements UserDetailsService {
 	private static Logger LOG = LoggerFactory.getLogger(sharpCartUserDetailsService.class);
 
+	public sharpCartUserDetailsService()
+	{
+		super();
+	}
+	
 	@Override
 	public UserDetails loadUserByUsername(String username)
 			throws UsernameNotFoundException {

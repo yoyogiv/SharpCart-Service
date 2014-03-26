@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import com.sharpcart.rest.security.sharpCartAuthenticationProvider;
-import com.sharpcart.rest.service.sharpCartUserDetailsService;
+import com.sharpcart.rest.security.sharpCartUserDetailsService;
 
 @Configuration
 public class CoreConfig {

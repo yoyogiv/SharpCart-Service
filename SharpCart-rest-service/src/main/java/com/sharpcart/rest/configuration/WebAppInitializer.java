@@ -34,7 +34,6 @@ public class WebAppInitializer implements WebApplicationInitializer {
   private WebApplicationContext createRootContext(ServletContext servletContext) {
     final AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
     rootContext.register(CoreConfig.class, SecurityConfig.class);
-    //rootContext.register(CoreConfig.class);
     rootContext.refresh();
 
     servletContext.addListener(new ContextLoaderListener(rootContext));
@@ -45,9 +44,7 @@ public class WebAppInitializer implements WebApplicationInitializer {
   // {!end addToRootContext}
 
   private void configureSpringMvc(ServletContext servletContext, WebApplicationContext rootContext) {
-	//debug
-	LOG.info("Configuring Spring MVC context");
-	
+
     final AnnotationConfigWebApplicationContext mvcContext = new AnnotationConfigWebApplicationContext();
     mvcContext.register(MVCConfig.class);
 
@@ -71,6 +68,7 @@ public class WebAppInitializer implements WebApplicationInitializer {
   private void configureSpringSecurity(ServletContext servletContext, WebApplicationContext rootContext) {
     final FilterRegistration.Dynamic springSecurity = servletContext.addFilter("springSecurityFilterChain",
         new DelegatingFilterProxy("springSecurityFilterChain", rootContext));
+    
     springSecurity.addMappingForUrlPatterns(null, true, "/*");
   }
   // {!end configureSpringSecurity}

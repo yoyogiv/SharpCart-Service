@@ -9,8 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
@@ -19,43 +19,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
   private AuthenticationProvider authenticationProvider;
   
-  @Override
-  protected void registerAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-	  //auth.userDetailsService(this.userDetailsService);
+  @Autowired
+  protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+	  
+	  //auth.inMemoryAuthentication().withUser("yoram.givon@gmail.com").password("Faeyy3303!").roles("USER");	    
+	  //auth.userDetailsService(userDetailsService);
 	  auth.authenticationProvider(authenticationProvider);
   }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-	
-    //allow anyone to register
-	http.authorizeUrls()
-	  	.antMatchers("/aggregators/user/register").anonymous();
-
-  	//allow anyone to try and login
-  	http.authorizeUrls()
-  		.antMatchers("/aggregators/user/login").anonymous();
-	
-  	//allow anyone to get unavailable items
-  	http.authorizeUrls()
-  		.antMatchers("/aggregators/groceryItems/unavailable").anonymous();
-  	
-  	/*
-	//only authorized users can optimize a list
-    http.authorizeUrls()
-        .antMatchers("/aggregators/optimize").hasRole("USER")
-        .anyRequest().anonymous()
-        .and()
-        .httpBasic();
-    
-	//only authorized users can update a user profile
-    http.authorizeUrls()
-        .antMatchers("/aggregators/user/update").hasRole("USER")
-        .anyRequest().anonymous()
-        .and()
-        .httpBasic();
-        */
-    
-
+    http
+    	.csrf().disable()
+    	.authorizeRequests()
+    	.antMatchers("/aggregators/user/register","/aggregators/user/login","/aggregators/groceryItems/unavailable").permitAll()
+        .antMatchers("/aggregators/optimize","/aggregators/user/update").hasRole("USER")
+        .anyRequest().authenticated()
+        .and().httpBasic();       
   }
 }

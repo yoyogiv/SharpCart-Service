@@ -21,7 +21,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
 import com.sharpcart.rest.dao.DAO;
-import com.sharpcart.rest.model.sharpCartUserDetails;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
 import com.sharpcart.rest.utilities.PasswordHash;
 
@@ -69,8 +68,8 @@ public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenti
         final String password = authentication.getCredentials().toString();
 
 		//debug
-		LOG.info("User Name: "+name); //name
-		LOG.info("User Password: "+password);//password
+		LOG.debug("User Name: "+name); //name
+		LOG.debug("User Password: "+password);//password
 		
 		SharpCartUser user = null;
 		try {
@@ -91,7 +90,8 @@ public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenti
 		
 		if (user==null)
 		{
-			LOG.info("user authentication failure - no user in db");
+			LOG.debug("user authentication failure - no user in db");
+			
             // temporary - the idea here is to generate the not authorized exception - not by hand, but by returning wrong credentials which in turn will be refused later
             return new org.springframework.security.core.userdetails.User("wrongUsername", "wrongPass", new ArrayList<GrantedAuthority>());
 		} else //check password
