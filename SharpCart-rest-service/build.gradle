@@ -41,9 +41,14 @@ repositories {
 dependencies {
 	provided 'javax.servlet:javax.servlet-api:3.0.1'
 	
+	//spring 4.0.2
+	compile 'org.springframework:spring-context:4.0.2.RELEASE'
+	compile 'org.springframework:spring-core:4.0.2.RELEASE'
+    compile 'org.springframework:spring-webmvc:4.0.2.RELEASE'
+    
 	//spring 3.2
-    compile 'org.springframework:spring-core:3.2.3.RELEASE'
-    compile 'org.springframework:spring-webmvc:3.2.3.RELEASE'
+    //compile 'org.springframework:spring-core:3.2.3.RELEASE'
+    //compile 'org.springframework:spring-webmvc:3.2.3.RELEASE'
     
     // {!begin security}
     compile 'org.springframework.security:spring-security-core:3.2.3.RELEASE'
@@ -60,9 +65,9 @@ dependencies {
     runtime 'org.slf4j:slf4j-jdk14:1.7.5'
     
 	//json and xml
-	compile 'com.jayway.jsonpath:json-path:0.8.1'
-    runtime 'com.fasterxml.jackson.core:jackson-core:2.2.2'
-    runtime 'com.fasterxml.jackson.core:jackson-databind:2.2.2'
+	compile 'com.jayway.jsonpath:json-path:0.9.1'
+    runtime 'com.fasterxml.jackson.core:jackson-core:2.3.2'
+    runtime 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
     runtime 'javax.xml.bind:jaxb-api:2.2.9'
     
     //tesing and commons

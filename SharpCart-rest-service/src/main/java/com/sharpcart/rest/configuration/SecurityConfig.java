@@ -32,8 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   
   @Autowired
   protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-	  
-	  //auth.inMemoryAuthentication().withUser("yoram.givon@gmail.com").password("Faeyy3303!").roles("USER");	    
+	      
 	  //auth.userDetailsService(userDetailsService);
 	  auth.authenticationProvider(authenticationProvider);
   }
@@ -47,8 +46,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     	.antMatchers("/aggregators/user/register","/aggregators/user/login","/aggregators/groceryItems/unavailable").permitAll()
         .antMatchers("/aggregators/optimize","/aggregators/user/update").permitAll()
         .anyRequest().authenticated()
-        .and()
-        .httpBasic().realmName("SharpCart Security")
+       // .and()
+      //  .httpBasic().realmName("SharpCart Security")
         .and()
         .sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
