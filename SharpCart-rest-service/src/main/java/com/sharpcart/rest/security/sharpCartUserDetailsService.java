@@ -1,13 +1,19 @@
 package com.sharpcart.rest.security;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.sharpcart.rest.dao.DAO;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
@@ -16,6 +22,8 @@ import com.sharpcart.rest.persistence.model.SharpCartUser;
 public class sharpCartUserDetailsService implements UserDetailsService {
 	private static Logger LOG = LoggerFactory.getLogger(sharpCartUserDetailsService.class);
 
+	private final Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+	
 	public sharpCartUserDetailsService()
 	{
 		super();
@@ -51,6 +59,4 @@ public class sharpCartUserDetailsService implements UserDetailsService {
 		
 		return new sharpCartUserDetails(user);
 	}
-
-	
 }

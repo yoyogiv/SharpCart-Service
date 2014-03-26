@@ -24,16 +24,15 @@ public class WebAppInitializer implements WebApplicationInitializer {
   public void onStartup(ServletContext servletContext) {
     final WebApplicationContext rootContext = createRootContext(servletContext);
 
-    configureSpringMvc(servletContext, rootContext);
-
     configureSpringSecurity(servletContext, rootContext);
+    configureSpringMvc(servletContext, rootContext);
   }
   // {!end onStartup}
 
   // {!begin addToRootContext}
   private WebApplicationContext createRootContext(ServletContext servletContext) {
     final AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
-    rootContext.register(CoreConfig.class, SecurityConfig.class);
+    rootContext.register(CoreConfig.class,SecurityConfig.class);
     rootContext.refresh();
 
     servletContext.addListener(new ContextLoaderListener(rootContext));

@@ -68,10 +68,11 @@ public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenti
         final String password = authentication.getCredentials().toString();
 
 		//debug
-		LOG.debug("User Name: "+name); //name
-		LOG.debug("User Password: "+password);//password
+		LOG.info("User Name: "+name); //name
+		LOG.info("User Password: "+password);//password
 		
 		SharpCartUser user = null;
+		
 		try {
 		//Find user in database
 		try {
@@ -90,7 +91,7 @@ public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenti
 		
 		if (user==null)
 		{
-			LOG.debug("user authentication failure - no user in db");
+			logger.debug("user authentication failure - no user in db");
 			
             // temporary - the idea here is to generate the not authorized exception - not by hand, but by returning wrong credentials which in turn will be refused later
             return new org.springframework.security.core.userdetails.User("wrongUsername", "wrongPass", new ArrayList<GrantedAuthority>());
@@ -99,11 +100,11 @@ public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenti
 	  		try {
 				if (PasswordHash.validatePassword(password, user.getPassword()))
 				{
-					LOG.info("user authentication success");
+					logger.debug("user authentication success");
 					return new sharpCartUserDetails(user);
 				} else // user is in database but provided password is incorrect
 				{
-					LOG.info("user authentication failure - wrong password");
+					logger.debug("user authentication failure - wrong password");
 		            // temporary - the idea here is to generate the not authorized exception - not by hand, but by returning wrong credentials which in turn will be refused later
 		            return new org.springframework.security.core.userdetails.User("wrongUsername", "wrongPass", new ArrayList<GrantedAuthority>());
 				}

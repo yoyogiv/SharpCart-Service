@@ -14,7 +14,6 @@ import org.springframework.util.Assert;
 
 import com.sharpcart.rest.persistence.model.SharpCartUser;
 
-@SuppressWarnings("serial")
 public class sharpCartUserDetails implements UserDetails {
 
 	public static final String SCOPE_READ = "read";
@@ -26,6 +25,8 @@ public class sharpCartUserDetails implements UserDetails {
 	private final Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
 	
 	private final SharpCartUser user;
+	
+	private static final long serialVersionUID = -6509897037222767090L;
 	
 	/*
 	 * A constructor that accepts a SharpCartUser
