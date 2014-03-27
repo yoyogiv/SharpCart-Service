@@ -76,7 +76,6 @@ public class SharpCartUser {
 		this.stores = stores;
 	}
 
-
 	/**
 	 * @return the zip
 	 */
@@ -147,7 +146,7 @@ public class SharpCartUser {
 	@OneToMany(cascade = CascadeType.ALL )
 	@JoinTable (
 			name="ActiveSharpLists",
-	        joinColumns =  @JoinColumn(name = "sharpCartUSer_id"),
+	        joinColumns =  @JoinColumn(name = "sharpCartUser_id"),
 	        inverseJoinColumns = @JoinColumn(name = "shoppingItem_id")
 			)
 	public Set<ShoppingItem> getActiveShoppingList() {
