@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
@@ -36,7 +33,7 @@ public class sharpCartUserDetails implements UserDetails {
 		Assert.notNull(user,"user object cannot be null");
 		
 		this.user = user;
-		for (String ga : Arrays.asList(ROLE_USER, SCOPE_READ,SCOPE_WRITE))
+		for (final String ga : Arrays.asList(ROLE_USER, SCOPE_READ,SCOPE_WRITE))
 		{
 			grantedAuthorities.add(new SimpleGrantedAuthority(ga));
 		}

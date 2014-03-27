@@ -126,14 +126,14 @@ public class UserManagementController {
 		  	  if (!jsonUser.getLastUpdated().equalsIgnoreCase("Jan 1, 1970 12:00:00 AM"))
 		  	  {
 		  		  try {
-					persistanceUser.setLastUpdated(DateFormat.getDateInstance().parse(jsonUser.getLastUpdated()));
+					persistanceUser.setUserInformationLastUpdate(DateFormat.getDateInstance().parse(jsonUser.getLastUpdated()));
 				} catch (final ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		  	  } else
 		  	  {
-		  		  persistanceUser.setLastUpdated(new Date());
+		  		  persistanceUser.setUserInformationLastUpdate(new Date());
 		  	  }
 		  	  
 		  	  //save user into database
@@ -258,7 +258,7 @@ public class UserManagementController {
 				{
 					//only update the database if the device profile is newer
 					try {
-							if (user.getLastUpdated().after(DateFormat.getDateInstance().parse(jsonUser.getLastUpdated())))
+							if (user.getUserInformationLastUpdate().after(DateFormat.getDateInstance().parse(jsonUser.getLastUpdated())))
 							{
 							  /* The user we created from the JSON file is NOT the same user we
 							   * can add to the database, namely they use different "stores" variable.
@@ -293,7 +293,7 @@ public class UserManagementController {
 							  
 								user.setStores(userStores);
 							  
-								user.setLastUpdated(new Date());
+								user.setUserInformationLastUpdate(new Date());
 								
 								//save user into database
 								DAO.getInstance().begin();
@@ -312,7 +312,7 @@ public class UserManagementController {
 								
 								String userStoresIdString = "";
 								
-								for (Store store : user.getStores())
+								for (final Store store : user.getStores())
 								{
 									userStoresIdString+=Long.valueOf(store.getId())+"-";
 								}

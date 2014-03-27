@@ -34,7 +34,7 @@ public class OptimizeSharpListController {
     @RequestMapping(method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<StorePrices> optimizeSharpList(@RequestBody final SharpList sharpList) {
-    	List<StorePrices> optimizedSharpList = new ArrayList<StorePrices>();
+    	final List<StorePrices> optimizedSharpList = new ArrayList<StorePrices>();
     	Query query;
     	SharpCartUser user = null;
     	Set<Store> stores = new HashSet<Store>();
@@ -62,20 +62,20 @@ public class OptimizeSharpListController {
     		stores = user.getStores();
     		
 	    	//for each store get the prices and total cost for the user sharp list items
-	    	for (Store store : stores)
+	    	for (final Store store : stores)
 	    	{
-	    		StorePrices storePrices = new StorePrices();
+	    		final StorePrices storePrices = new StorePrices();
 	    		
 	    		storePrices.setId(store.getId());
 	    		storePrices.setName(store.getName());
 	    		storePrices.setStore_image_location(store.getImageLocation());
 	    		
 	    		//get prices for items
-	    		List<ShoppingListItem> groceryItems = new ArrayList<ShoppingListItem>();
+	    		final List<ShoppingListItem> groceryItems = new ArrayList<ShoppingListItem>();
 	    		
 	    		Assert.notNull(sharpList.getMainSharpList(),"optimization can not work without a valid list of grocery items");
 	    		
-	    		for (ShoppingListItem item : sharpList.getMainSharpList())
+	    		for (final ShoppingListItem item : sharpList.getMainSharpList())
 	    		{
 	    			//debug
 	    	    	LOG.debug("Main sharp list item id: "+item.getId());
@@ -102,7 +102,7 @@ public class OptimizeSharpListController {
 	    	    	if (storeItem!=null)
 	    	    	{
 		    	    	//Now that we have the store item we can generate our ShoppingListItem from it
-		    	    	ShoppingListItem shoppingListItem = new ShoppingListItem();
+		    	    	final ShoppingListItem shoppingListItem = new ShoppingListItem();
 		    	    	/*
 		    	    	 * Id
 		    	    	 * Name
@@ -174,7 +174,7 @@ public class OptimizeSharpListController {
 	    	    	
 	    	    	//calculate total cost
 	    	    	float totalCost = 0;
-	    	    	for (ShoppingListItem groceryItem : groceryItems)
+	    	    	for (final ShoppingListItem groceryItem : groceryItems)
 	    	    	{
 	    	    		totalCost+=groceryItem.getTotal_price();
 	    	    	}

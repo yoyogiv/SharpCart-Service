@@ -77,7 +77,7 @@ public class UsersUnitTest {
 	  user.setZip("78681");
 	  user.setFamilySize("3");
 	  user.setStores(stores);
-	  user.setLastUpdated(new Date());
+	  user.setUserInformationLastUpdate(new Date());
 	
 	  //Save user to database
 	  DAO.getInstance().begin();
@@ -127,7 +127,7 @@ public class UsersUnitTest {
 	  //Update user stores
 	  user.setStores(stores);
 	  
-	  user.setLastUpdated(new Date());
+	  user.setUserInformationLastUpdate(new Date());
 	  
 	  //Update user in database
 	  DAO.getInstance().getSession().update(user);

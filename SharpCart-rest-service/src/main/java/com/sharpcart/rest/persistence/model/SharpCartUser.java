@@ -3,12 +3,16 @@ package com.sharpcart.rest.persistence.model;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -27,24 +31,11 @@ public class SharpCartUser {
 	
 	private String password;
 	
-	private Date	lastUpdated;
+	private Date	userInformationLastUpdate;
 	
-	/**
-	 * @param stores
-	 * @param zip
-	 * @param familySize
-	 * @param userName
-	 * @param password
-	 */
-	public SharpCartUser(Set<Store> stores, String zip, String familySize,
-			String userName, String password) {
-		this.stores = stores;
-		this.zip = zip;
-		this.familySize = familySize;
-		this.userName = userName;
-		this.password = password;
-		//this.stores = new HashSet<Store>();
-	}
+	private Set<ShoppingItem> activeShoppingList;
+	
+	private Date	activeShoppingListLastUpdate;	
 
 	public SharpCartUser()
 	{
@@ -137,18 +128,50 @@ public class SharpCartUser {
 	}
 
 	/**
-	 * @return the lastUpdated
+	 * @return the userInformationLastUpdate
 	 */
-	public Date getLastUpdated() {
-		return lastUpdated;
+	public Date getUserInformationLastUpdate() {
+		return userInformationLastUpdate;
 	}
 
 	/**
-	 * @param lastUpdated the lastUpdated to set
+	 * @param userInformationLastUpdate the userInformationLastUpdate to set
 	 */
-	public void setLastUpdated(Date lastUpdated) {
-		this.lastUpdated = lastUpdated;
+	public void setUserInformationLastUpdate(Date userInformationLastUpdate) {
+		this.userInformationLastUpdate = userInformationLastUpdate;
 	}
-	
-	
+
+	/**
+	 * @return the activeShoppingList
+	 */
+	@OneToMany(cascade = CascadeType.ALL )
+	@JoinTable (
+			name="ActiveSharpLists",
+	        joinColumns =  @JoinColumn(name = "sharpCartUSer_id"),
+	        inverseJoinColumns = @JoinColumn(name = "shoppingItem_id")
+			)
+	public Set<ShoppingItem> getActiveShoppingList() {
+		return activeShoppingList;
+	}
+
+	/**
+	 * @param activeShoppingList the activeShoppingList to set
+	 */
+	public void setActiveShoppingList(Set<ShoppingItem> activeShoppingList) {
+		this.activeShoppingList = activeShoppingList;
+	}
+
+	/**
+	 * @return the activeShoppingListLastUpdate
+	 */
+	public Date getActiveShoppingListLastUpdate() {
+		return activeShoppingListLastUpdate;
+	}
+
+	/**
+	 * @param activeShoppingListLastUpdate the activeShoppingListLastUpdate to set
+	 */
+	public void setActiveShoppingListLastUpdate(Date activeShoppingListLastUpdate) {
+		this.activeShoppingListLastUpdate = activeShoppingListLastUpdate;
+	}
 }
