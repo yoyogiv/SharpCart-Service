@@ -4,6 +4,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -136,6 +137,9 @@ public class UserManagementController {
 		  		  persistanceUser.setUserInformationLastUpdate(new Date());
 		  	  }
 		  	  
+		  	  persistanceUser.setActiveShoppingList(null);
+		  	  persistanceUser.setActiveShoppingListLastUpdate(null);
+		  	  
 		  	  //save user into database
 		  	  DAO.getInstance().begin();
 			  DAO.getInstance().getSession().save(persistanceUser);
@@ -225,6 +229,8 @@ public class UserManagementController {
     	SharpCartUser user = null;
     	UserProfile updatedJsonUser = new UserProfile();
     	
+		final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		
     	//debug
     	/*
     	LOG.info("User Name: "+jsonUser.getUserName()); //name
@@ -258,7 +264,7 @@ public class UserManagementController {
 				{
 					//only update the database if the device profile is newer
 					try {
-							if (user.getUserInformationLastUpdate().after(DateFormat.getDateInstance().parse(jsonUser.getLastUpdated())))
+							if (user.getUserInformationLastUpdate().after(df.parse(jsonUser.getLastUpdated())))
 							{
 							  /* The user we created from the JSON file is NOT the same user we
 							   * can add to the database, namely they use different "stores" variable.
@@ -321,6 +327,8 @@ public class UserManagementController {
 								userStoresIdString = userStoresIdString.substring(0, userStoresIdString.lastIndexOf("-"));
 								
 								updatedJsonUser.setStores(userStoresIdString);
+								
+								updatedJsonUser.setLastUpdated(df.format(user.getUserInformationLastUpdate()));
 							}
 						} catch (final NumberFormatException e) {
 							// TODO Auto-generated catch block

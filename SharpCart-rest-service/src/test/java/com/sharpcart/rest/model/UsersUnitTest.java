@@ -78,6 +78,8 @@ public class UsersUnitTest {
 	  user.setFamilySize("3");
 	  user.setStores(stores);
 	  user.setUserInformationLastUpdate(new Date());
+	  user.setActiveShoppingList(null);
+	  user.setActiveShoppingListLastUpdate(null);
 	
 	  //Save user to database
 	  DAO.getInstance().begin();

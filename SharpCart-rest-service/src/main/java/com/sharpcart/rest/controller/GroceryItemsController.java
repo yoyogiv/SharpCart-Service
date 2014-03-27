@@ -1,5 +1,7 @@
 package com.sharpcart.rest.controller;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +26,8 @@ import com.sharpcart.rest.persistence.model.StoreItem;
 @Controller
 public class GroceryItemsController {
 	private static Logger LOG = LoggerFactory.getLogger(GroceryItemsController.class);
+	
+	DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	
 	public GroceryItemsController()
 	{
