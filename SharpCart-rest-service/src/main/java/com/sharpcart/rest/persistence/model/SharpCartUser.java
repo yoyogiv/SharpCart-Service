@@ -33,7 +33,7 @@ public class SharpCartUser {
 	
 	private Date	userInformationLastUpdate;
 	
-	private Set<ShoppingItem> activeShoppingList;
+	private Set<UserShoppingItem> activeShoppingList;
 	
 	private Date	activeShoppingListLastUpdate;	
 
@@ -143,20 +143,22 @@ public class SharpCartUser {
 	/**
 	 * @return the activeShoppingList
 	 */
-	@OneToMany(cascade = CascadeType.ALL )
+	@OneToMany(cascade = CascadeType.ALL , mappedBy = "user")
+	/*
 	@JoinTable (
 			name="ActiveSharpLists",
 	        joinColumns =  @JoinColumn(name = "sharpCartUser_id"),
-	        inverseJoinColumns = @JoinColumn(name = "shoppingItem_id")
+	        inverseJoinColumns = @JoinColumn(name = "userShoppingItem_id")
 			)
-	public Set<ShoppingItem> getActiveShoppingList() {
+	*/
+	public Set<UserShoppingItem> getActiveShoppingList() {
 		return activeShoppingList;
 	}
 
 	/**
 	 * @param activeShoppingList the activeShoppingList to set
 	 */
-	public void setActiveShoppingList(Set<ShoppingItem> activeShoppingList) {
+	public void setActiveShoppingList(Set<UserShoppingItem> activeShoppingList) {
 		this.activeShoppingList = activeShoppingList;
 	}
 

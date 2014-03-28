@@ -30,8 +30,10 @@ import com.sharpcart.rest.model.ShoppingListItem;
 import com.sharpcart.rest.model.StorePrices;
 import com.sharpcart.rest.model.UserProfile;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
+import com.sharpcart.rest.persistence.model.ShoppingItem;
 import com.sharpcart.rest.persistence.model.Store;
 import com.sharpcart.rest.persistence.model.StoreItem;
+import com.sharpcart.rest.persistence.model.UserShoppingItem;
 import com.sharpcart.rest.utilities.PasswordHash;
 import com.sharpcart.rest.utilities.SharpCartConstants;
 
@@ -41,7 +43,8 @@ public class UserManagementController {
     private static Logger LOG = LoggerFactory.getLogger(UserManagementController.class);
 	
     private Query query;
-    
+	final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	
 	public UserManagementController()
 	{
 		
@@ -237,8 +240,6 @@ public class UserManagementController {
     	SharpCartUser user = null;
     	UserProfile updatedJsonUser = new UserProfile();
     	
-		final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		
     	//debug
     	/*
     	LOG.info("User Name: "+jsonUser.getUserName()); //name
@@ -378,7 +379,9 @@ public class UserManagementController {
     	Query query;
     	SharpCartUser user = null;
     	SharpList syncedSharpList = new SharpList();
+    	syncedSharpList = sharpList; //we start by assuming that there will be no need to update the user sharp list on the device
     	
+    	//get user from database
     	try {
   	  		DAO.getInstance().begin();
 	  	  	query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
@@ -395,7 +398,26 @@ public class UserManagementController {
     	
     	if (user!=null)
     	{	
-
+    		//check if database user sharplist is newer or older than device version
+    		
+    		//if it is newer, return database version to device
+    		
+    		//if it is older, update database with device version
+    		Set<UserShoppingItem> tempShoppingItemSet = new HashSet<UserShoppingItem>();
+    		
+    		for (ShoppingListItem item : sharpList.getMainSharpList())
+    		{
+    			//convert a ShoppingListItem into a UserShoppingItem
+    		}
+    		
+    		user.setActiveShoppingList(tempShoppingItemSet);
+    		
+    		try {
+				user.setActiveShoppingListLastUpdate(df.parse(sharpList.getLastUpdated()));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     	}
     	
     	DAO.getInstance().close();

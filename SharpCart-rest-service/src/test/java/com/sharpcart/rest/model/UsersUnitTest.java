@@ -58,6 +58,7 @@ public class UsersUnitTest {
 		}
 	  } catch (final HibernateException ex)
 	  {
+		  ex.printStackTrace();
 		  DAO.getInstance().rollback();
 	  }
 	  
@@ -96,8 +97,6 @@ public class UsersUnitTest {
 	  assertNotNull(user);
 	  
 	  DAO.getInstance().close();
-	  
-	  
   }
 
   /*

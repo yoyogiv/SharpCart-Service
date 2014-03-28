@@ -15,7 +15,6 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="ShoppingItem")
-
 public class ShoppingItem implements Comparable<ShoppingItem>{
 	private Long id;
 
