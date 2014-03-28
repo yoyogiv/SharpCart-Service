@@ -379,6 +379,8 @@ public class UserManagementController {
     	Query query;
     	SharpCartUser user = null;
     	SharpList syncedSharpList = sharpList;
+    	Set<UserShoppingItem> tempShoppingItemSet;
+    	
     	//syncedSharpList = sharpList; //we start by assuming that there will be no need to update the user sharp list on the device
     	
     	//get user from database
@@ -403,7 +405,13 @@ public class UserManagementController {
     		//if it is newer, return database version to device
     		
     		//if it is older, update database with device version
-    		Set<UserShoppingItem> tempShoppingItemSet = new HashSet<UserShoppingItem>();
+    		if (user.getActiveShoppingList()!=null)
+    		{
+    			tempShoppingItemSet = user.getActiveShoppingList();
+    		} else
+    		{
+    			tempShoppingItemSet = new HashSet<UserShoppingItem>();
+    		}
     		
     		for (ShoppingListItem item : sharpList.getMainSharpList())
     		{

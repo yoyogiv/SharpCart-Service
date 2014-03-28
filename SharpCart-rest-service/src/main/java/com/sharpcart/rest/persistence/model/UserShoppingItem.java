@@ -14,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="UserShoppingItem")
-public class UserShoppingItem {
+public class UserShoppingItem implements Comparable<UserShoppingItem>{
 	
 	private Long id;
 	private ShoppingItem shoppingItem;
@@ -86,6 +86,11 @@ public class UserShoppingItem {
 	 */
 	public void setQuantity(double quantity) {
 		this.quantity = quantity;
+	}
+
+	@Override
+	public int compareTo(UserShoppingItem o) {
+		return this.shoppingItem.getId().compareTo(o.getShoppingItem().getId());
 	}	
 	
 }
