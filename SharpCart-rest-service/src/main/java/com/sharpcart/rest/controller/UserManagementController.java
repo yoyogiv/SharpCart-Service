@@ -5,6 +5,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,9 +25,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sharpcart.rest.dao.DAO;
+import com.sharpcart.rest.model.SharpList;
+import com.sharpcart.rest.model.ShoppingListItem;
+import com.sharpcart.rest.model.StorePrices;
 import com.sharpcart.rest.model.UserProfile;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
 import com.sharpcart.rest.persistence.model.Store;
+import com.sharpcart.rest.persistence.model.StoreItem;
 import com.sharpcart.rest.utilities.PasswordHash;
 import com.sharpcart.rest.utilities.SharpCartConstants;
 
@@ -225,6 +231,8 @@ public class UserManagementController {
     @ResponseBody
     public UserProfile updateUser(@RequestBody final UserProfile jsonUser) {
     	
+    	Assert.notNull(jsonUser,"jsonUser cannot be null for an update operation");
+    	
     	String result = SharpCartConstants.SERVER_ERROR_CODE;
     	SharpCartUser user = null;
     	UserProfile updatedJsonUser = new UserProfile();
@@ -361,5 +369,37 @@ public class UserManagementController {
 	  	DAO.getInstance().close();  	
     	
     	return updatedJsonUser;
+    }
+    
+    @RequestMapping(value="/aggregators/user/syncSharpList",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public SharpList syncSharpList(@RequestBody final SharpList sharpList) {
+   
+    	Query query;
+    	SharpCartUser user = null;
+    	SharpList syncedSharpList = new SharpList();
+    	
+    	try {
+  	  		DAO.getInstance().begin();
+	  	  	query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
+	  	  	query.setString("userName", sharpList.getUserName());
+	  	  	user = (SharpCartUser)query.uniqueResult();
+	  	  	DAO.getInstance().commit();
+    	} catch (final HibernateException ex)
+    	{
+    		DAO.getInstance().rollback();
+    		ex.printStackTrace();
+    	}
+    	
+    	Assert.notNull(user,"sync sharp list can not work without a valid user object");
+    	
+    	if (user!=null)
+    	{	
+
+    	}
+    	
+    	DAO.getInstance().close();
+    	
+    	return syncedSharpList;
     }
 }
