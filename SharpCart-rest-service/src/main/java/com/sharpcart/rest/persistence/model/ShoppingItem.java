@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.sharpcart.rest.model.ShoppingListItem;
+
 /**
  * A shopping item
  */
@@ -41,7 +43,7 @@ public class ShoppingItem implements Comparable<ShoppingItem>{
 		this.imageLocation = imageLocation;
 		this.unitToItemConversionRatio = unitToItemConversionRatio;
 	}
-
+	
 	//empty constructor
 	public ShoppingItem(){
 		

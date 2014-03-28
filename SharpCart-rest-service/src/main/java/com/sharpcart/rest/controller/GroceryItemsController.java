@@ -41,6 +41,8 @@ public class GroceryItemsController {
     @ResponseBody
     public List<ShoppingItem> getUnavailableGroceryItems(@RequestParam(value="userName", required=true) String userName) {
     	
+    	
+    	
     	final ArrayList<ShoppingItem> unavilableItems = new ArrayList<ShoppingItem>();
     	final ArrayList<ShoppingItem> unavilableItemsCleaned = new ArrayList<ShoppingItem>();
     	

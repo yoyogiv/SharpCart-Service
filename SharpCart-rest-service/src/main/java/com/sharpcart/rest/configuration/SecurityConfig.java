@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     	.csrf().disable()
     	.authorizeRequests()
     	.antMatchers("/aggregators/user/register","/aggregators/user/login","/aggregators/groceryItems/unavailable").permitAll()
-        .antMatchers("/aggregators/optimize","/aggregators/user/update").permitAll()
+        .antMatchers("/aggregators/optimize","/aggregators/user/update","/aggregators/user/syncSharpList").permitAll()
         .anyRequest().authenticated()
         //.and()
        // .httpBasic().realmName("SharpCart Security")
