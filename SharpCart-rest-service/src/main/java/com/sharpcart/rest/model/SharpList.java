@@ -18,6 +18,9 @@ public class  SharpList{
     public SharpList() {
     	mainSharpList = new ArrayList<ShoppingListItem>();
     	userName = "";
+    	email="";
+    	action="";
+    	listTitle="";
     	is_deleted = false;
     	timeZone = TimeZone.getDefault().getID();	
     }

@@ -91,6 +91,50 @@ public class UserShoppingItem implements Comparable<UserShoppingItem>{
 	@Override
 	public int compareTo(UserShoppingItem o) {
 		return this.shoppingItem.getId().compareTo(o.getShoppingItem().getId());
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((shoppingItem == null) ? 0 : shoppingItem.getId().hashCode());
+		result = prime * result + ((user == null) ? 0 : user.getId().hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		
+		UserShoppingItem other = (UserShoppingItem) obj;
+		
+		if (shoppingItem == null) {
+			if (other.shoppingItem != null)
+				return false;
+			
+		} else if (!shoppingItem.getId().equals(other.shoppingItem.getId()))
+			return false;
+		
+		if (user == null) {
+			if (other.user != null)
+				return false;
+			
+		} else if (!user.getId().equals(other.user.getId()))
+			return false;
+		
+		return true;
 	}	
 	
 }
