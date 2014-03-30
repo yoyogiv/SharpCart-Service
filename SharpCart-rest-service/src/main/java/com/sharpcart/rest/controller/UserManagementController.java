@@ -449,7 +449,7 @@ public class UserManagementController {
     		//try {
     			//update user last updated synced shopping list and returned sharp list
 				user.setActiveShoppingListLastUpdate(new Date());
-				syncedSharpList.setLastUpdated(df.format(new Date()));
+				syncedSharpList.setLastUpdated(new Date());
 			//} catch (ParseException e) {
 				// TODO Auto-generated catch block
 			//	e.printStackTrace();

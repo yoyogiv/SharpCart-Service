@@ -1,6 +1,7 @@
 package com.sharpcart.rest.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -12,7 +13,7 @@ public class  SharpList{
     private String action;
     private String listTitle;
     private boolean is_deleted;
-    private String lastUpdated;
+    private Date lastUpdated;
     private String timeZone;
     
     public SharpList() {
@@ -142,14 +143,14 @@ public class  SharpList{
 	/**
 	 * @return the lastUpdated
 	 */
-	public String getLastUpdated() {
+	public Date getLastUpdated() {
 		return lastUpdated;
 	}
 
 	/**
 	 * @param lastUpdated the lastUpdated to set
 	 */
-	public void setLastUpdated(final String lastUpdated) {
+	public void setLastUpdated(final Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
 
