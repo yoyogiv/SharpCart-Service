@@ -13,7 +13,7 @@ public class  SharpList{
     private String action;
     private String listTitle;
     private boolean is_deleted;
-    private Date lastUpdated;
+    private String lastUpdated;
     private String timeZone;
     
     public SharpList() {
@@ -143,14 +143,14 @@ public class  SharpList{
 	/**
 	 * @return the lastUpdated
 	 */
-	public Date getLastUpdated() {
+	public String getLastUpdated() {
 		return lastUpdated;
 	}
 
 	/**
 	 * @param lastUpdated the lastUpdated to set
 	 */
-	public void setLastUpdated(final Date lastUpdated) {
+	public void setLastUpdated(final String lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
 

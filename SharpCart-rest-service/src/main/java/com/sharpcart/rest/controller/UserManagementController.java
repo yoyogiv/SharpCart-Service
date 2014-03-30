@@ -62,11 +62,13 @@ public class UserManagementController {
     	SharpCartUser user = null;
     	
     	//debug
+    	/*
     	LOG.info("User Name: "+jsonUser.getUserName()); //name
     	LOG.info("User Password: "+jsonUser.getPassword()); //password
     	LOG.info("User Zip: "+jsonUser.getZip()); //zip
     	LOG.info("User Family Size: "+jsonUser.getFamilySize()); //family size
     	LOG.info("User Stores: "+jsonUser.getStores()); //stores
+    	*/
     	
     	//hash user password
     	try {
@@ -133,14 +135,10 @@ public class UserManagementController {
 		  	  
 		  	  persistanceUser.setStores(userStores);
 		  	  
-		  	  if (!jsonUser.getLastUpdated().equalsIgnoreCase("Jan 1, 1970 12:00:00 AM"))
+		  	  if (!jsonUser.getLastUpdated().equals(new Date(0)))
 		  	  {
-		  		  try {
-					persistanceUser.setUserInformationLastUpdate(DateFormat.getDateInstance().parse(jsonUser.getLastUpdated()));
-				} catch (final ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				persistanceUser.setUserInformationLastUpdate(df.parse(jsonUser.getLastUpdated()));
+
 		  	  } else
 		  	  {
 		  		  persistanceUser.setUserInformationLastUpdate(new Date());
@@ -155,7 +153,7 @@ public class UserManagementController {
 			  DAO.getInstance().commit();
 			  
 			  result = SharpCartConstants.RECORD_CREATED;
-	  	  } catch (final HibernateException ex)
+	  	  } catch (final HibernateException | ParseException ex)
 	  	  {
 	  		  DAO.getInstance().rollback();
 	  		  ex.printStackTrace();
@@ -247,7 +245,7 @@ public class UserManagementController {
     	LOG.info("User Zip: "+jsonUser.getZip()); //zip
     	LOG.info("User Family Size: "+jsonUser.getFamilySize()); //family size
     	LOG.info("User Stores: "+jsonUser.getStores()); //stores
-    	*/
+    	 */
     	
     	//check if user already exits in the system
     	try {
@@ -269,7 +267,7 @@ public class UserManagementController {
 	  	{
 	  		//verify user password
 	  		try {
-				if (PasswordHash.validatePassword(jsonUser.getPassword(), user.getPassword()))
+				if ((jsonUser.getPassword()!=null) && PasswordHash.validatePassword(jsonUser.getPassword(), user.getPassword()))
 				{
 					//only update the database if the device profile is newer
 					try {
@@ -339,16 +337,15 @@ public class UserManagementController {
 								
 								updatedJsonUser.setLastUpdated(df.format(user.getUserInformationLastUpdate()));
 							}
-						} catch (final NumberFormatException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (final ParseException e) {
+						} catch (final NumberFormatException | ParseException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 				} else // user is in database but provided password is incorrect
 				{
 					result = SharpCartConstants.ACCESS_DENIED;
+					LOG.info("User Name: "+jsonUser.getUserName()); //name
+					LOG.info("User Password: "+jsonUser.getFamilySize()); //password
 				}
 			} catch (final NoSuchAlgorithmException e) {
 				// TODO Auto-generated catch block
@@ -449,7 +446,8 @@ public class UserManagementController {
     		//try {
     			//update user last updated synced shopping list and returned sharp list
 				user.setActiveShoppingListLastUpdate(new Date());
-				syncedSharpList.setLastUpdated(new Date());
+				syncedSharpList.setLastUpdated(df.format(new Date()));
+				
 			//} catch (ParseException e) {
 				// TODO Auto-generated catch block
 			//	e.printStackTrace();

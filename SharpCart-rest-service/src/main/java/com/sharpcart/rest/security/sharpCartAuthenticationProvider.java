@@ -29,7 +29,8 @@ public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenti
 	private static Logger LOG = LoggerFactory.getLogger(sharpCartAuthenticationProvider.class);
     // ~ Instance fields ================================================================================================
 
-    private PasswordEncoder passwordEncoder = new PlaintextPasswordEncoder();
+    @SuppressWarnings("deprecation")
+	private PasswordEncoder passwordEncoder = new PlaintextPasswordEncoder();
 
     private SaltSource saltSource;
 
@@ -135,7 +136,8 @@ public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenti
      * @param passwordEncoderToSet
      *            must be an instance of one of the {@code PasswordEncoder} types.
      */
-    public void setPasswordEncoder(final Object passwordEncoderToSet) {
+    @SuppressWarnings("deprecation")
+	public void setPasswordEncoder(final Object passwordEncoderToSet) {
         Assert.notNull(passwordEncoderToSet, "passwordEncoder cannot be null");
 
         if (passwordEncoderToSet instanceof PasswordEncoder) {
@@ -169,7 +171,8 @@ public class sharpCartAuthenticationProvider extends AbstractUserDetailsAuthenti
         throw new IllegalArgumentException("passwordEncoder must be a PasswordEncoder instance");
     }
 
-    protected PasswordEncoder getPasswordEncoder() {
+    @SuppressWarnings("deprecation")
+	protected PasswordEncoder getPasswordEncoder() {
         return passwordEncoder;
     }
 

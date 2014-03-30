@@ -1,5 +1,6 @@
 package com.sharpcart.rest.model;
 
+import java.util.Date;
 import java.util.Set;
 
 public class UserProfile {
@@ -15,7 +16,6 @@ public class UserProfile {
 		familySize = "";
 		userName = "";
 		stores = "";
-		lastUpdated = "";
 	}
 
 	/**

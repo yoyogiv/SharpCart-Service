@@ -1,5 +1,6 @@
 package com.sharpcart.rest.configuration;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,13 @@ public class CoreConfig {
     {
         final RequestMappingHandlerAdapter annotationMethodHandlerAdapter = new RequestMappingHandlerAdapter();
         final MappingJackson2HttpMessageConverter mappingJacksonHttpMessageConverter = new MappingJackson2HttpMessageConverter();
-
+        
+        //setup the json date format
+        final com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm"));
+        mappingJacksonHttpMessageConverter.setObjectMapper(objectMapper);
+        
+        
         final List<HttpMessageConverter<?>> httpMessageConverter = new ArrayList<HttpMessageConverter<?>>();
         httpMessageConverter.add(mappingJacksonHttpMessageConverter);
 
