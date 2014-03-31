@@ -238,14 +238,14 @@ public class UserManagementController {
     	SharpCartUser user = null;
     	UserProfile updatedJsonUser = new UserProfile();
     	
-    	//debug
-    	/*
-    	LOG.info("User Name: "+jsonUser.getUserName()); //name
-    	LOG.info("User Password: "+jsonUser.getPassword()); //password
-    	LOG.info("User Zip: "+jsonUser.getZip()); //zip
-    	LOG.info("User Family Size: "+jsonUser.getFamilySize()); //family size
-    	LOG.info("User Stores: "+jsonUser.getStores()); //stores
-    	 */
+    	//debug	
+    	LOG.debug("User Name: "+jsonUser.getUserName()); //name
+    	LOG.debug("User Password: "+jsonUser.getPassword()); //password
+    	LOG.debug("User Zip: "+jsonUser.getZip()); //zip
+    	LOG.debug("User Family Size: "+jsonUser.getFamilySize()); //family size
+    	LOG.debug("User Stores: "+jsonUser.getStores()); //stores
+    	LOG.debug("Last Updated: "+jsonUser.getLastUpdated()); //last updated
+    	 
     	
     	//check if user already exits in the system
     	try {
@@ -271,8 +271,10 @@ public class UserManagementController {
 				{
 					//only update the database if the device profile is newer
 					try {
-							if (user.getUserInformationLastUpdate().after(df.parse(jsonUser.getLastUpdated())))
+							if (user.getUserInformationLastUpdate().before(df.parse(jsonUser.getLastUpdated())))
 							{
+								LOG.info("Device user information is newer, copying it to database");
+								
 							  /* The user we created from the JSON file is NOT the same user we
 							   * can add to the database, namely they use different "stores" variable.
 							   * In order to be able to save the JSON user in the database we need to convert it
@@ -336,6 +338,14 @@ public class UserManagementController {
 								updatedJsonUser.setStores(userStoresIdString);
 								
 								updatedJsonUser.setLastUpdated(df.format(user.getUserInformationLastUpdate()));
+								
+								//debug
+						    	LOG.debug("Updated User Name: "+updatedJsonUser.getUserName()); //name
+						    	LOG.debug("Updated User Password: "+updatedJsonUser.getPassword()); //password
+						    	LOG.debug("Updated User Zip: "+updatedJsonUser.getZip()); //zip
+						    	LOG.debug("Updated User Family Size: "+updatedJsonUser.getFamilySize()); //family size
+						    	LOG.debug("Updated User Stores: "+updatedJsonUser.getStores()); //stores
+						    	LOG.debug("Updated Last Updated: "+updatedJsonUser.getLastUpdated()); //last updated
 							}
 						} catch (final NumberFormatException | ParseException e) {
 							// TODO Auto-generated catch block
@@ -344,8 +354,8 @@ public class UserManagementController {
 				} else // user is in database but provided password is incorrect
 				{
 					result = SharpCartConstants.ACCESS_DENIED;
-					LOG.info("User Name: "+jsonUser.getUserName()); //name
-					LOG.info("User Password: "+jsonUser.getFamilySize()); //password
+					LOG.debug("User Name: "+jsonUser.getUserName()); //name
+					LOG.debug("User Password: "+jsonUser.getFamilySize()); //password
 				}
 			} catch (final NoSuchAlgorithmException e) {
 				// TODO Auto-generated catch block
@@ -375,10 +385,8 @@ public class UserManagementController {
    
     	Query query;
     	SharpCartUser user = null;
-    	SharpList syncedSharpList = sharpList;
+    	SharpList syncedSharpList = sharpList; //we start by assuming that there will be no need to update the user sharp list on the device
     	Set<UserShoppingItem> tempShoppingItemSet;
-    	
-    	//syncedSharpList = sharpList; //we start by assuming that there will be no need to update the user sharp list on the device
     	
     	//get user from database
     	try {
@@ -401,7 +409,7 @@ public class UserManagementController {
     		
     		//if it is newer, return database version to device
     		
-    		//if it is older, update database with device version
+    		//if it is older, update database with device version and delete any older information
     		if (user.getActiveShoppingList()!=null)
     		{
     			tempShoppingItemSet = user.getActiveShoppingList();
@@ -435,12 +443,17 @@ public class UserManagementController {
     				return syncedSharpList; //if even one of the grocery items can not be saved we need to exit the method
     			}
     			
+    			//debug
+    			LOG.info("Shopping Item Name: "+userShoppingItem.getShoppingItem().getName()); 
+    			
     			//add user shopping item to set
     			tempShoppingItemSet.add(userShoppingItem);
     		}
     		
     		//update user active sharp list and the returned synced sharp list
+    		user.getActiveShoppingList().clear();   		
     		user.setActiveShoppingList(tempShoppingItemSet);
+    		
     		syncedSharpList.setMainSharpList(sharpList.getMainSharpList());
     		
     		//try {
@@ -455,6 +468,8 @@ public class UserManagementController {
     		
     		//Save user to database
     		try {
+    			LOG.info("Updating user after I update the active shopping list");
+    			
 	    		DAO.getInstance().begin();
 	    		DAO.getInstance().getSession().update(user);
 	    		DAO.getInstance().commit();
@@ -463,6 +478,7 @@ public class UserManagementController {
     			DAO.getInstance().rollback();
     			ex.printStackTrace();
     		}
+    		
     	}
     	
     	DAO.getInstance().close();

@@ -143,14 +143,7 @@ public class SharpCartUser {
 	/**
 	 * @return the activeShoppingList
 	 */
-	@OneToMany(cascade = CascadeType.ALL , mappedBy = "user")
-	/*
-	@JoinTable (
-			name="ActiveSharpLists",
-	        joinColumns =  @JoinColumn(name = "sharpCartUser_id"),
-	        inverseJoinColumns = @JoinColumn(name = "userShoppingItem_id")
-			)
-	*/
+	@OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
 	public Set<UserShoppingItem> getActiveShoppingList() {
 		return activeShoppingList;
 	}

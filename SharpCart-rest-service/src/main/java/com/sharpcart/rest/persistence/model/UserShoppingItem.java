@@ -23,7 +23,8 @@ public class UserShoppingItem implements Comparable<UserShoppingItem>{
 	
 	public UserShoppingItem()
 	{
-		
+		shoppingItem = new ShoppingItem();
+		user = new SharpCartUser();
 	}
 
 	/**
@@ -46,7 +47,7 @@ public class UserShoppingItem implements Comparable<UserShoppingItem>{
 	 * @return the shoppingItem
 	 */
 	@ManyToOne
-	@JoinColumn(name="shoppingItemId")
+	@JoinColumn(name="shoppingItemId",nullable=false)
 	public ShoppingItem getShoppingItem() {
 		return shoppingItem;
 	}
@@ -61,8 +62,8 @@ public class UserShoppingItem implements Comparable<UserShoppingItem>{
 	/**
 	 * @return the user
 	 */
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "sharpCartUserId",nullable = false)
+	@ManyToOne
+	@JoinColumn(name="userId",nullable=false)
 	public SharpCartUser getUser() {
 		return user;
 	}
@@ -100,9 +101,8 @@ public class UserShoppingItem implements Comparable<UserShoppingItem>{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((shoppingItem == null) ? 0 : shoppingItem.getId().hashCode());
-		result = prime * result + ((user == null) ? 0 : user.getId().hashCode());
+		result = prime * result + ((shoppingItem == null) ? 0 : shoppingItem.getId().hashCode());
+		result = prime * result + ((user == null) ? 0 : user.getUserName().hashCode());
 		return result;
 	}
 
@@ -131,7 +131,7 @@ public class UserShoppingItem implements Comparable<UserShoppingItem>{
 			if (other.user != null)
 				return false;
 			
-		} else if (!user.getId().equals(other.user.getId()))
+		} else if (!user.getId().equals(other.user.getUserName()))
 			return false;
 		
 		return true;
