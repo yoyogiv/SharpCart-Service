@@ -1,6 +1,7 @@
 package com.sharpcart.rest.persistence.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -14,6 +15,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.print.attribute.HashAttributeSet;
 
 @Entity
 @Table(name="SharpCartUser")
@@ -39,7 +41,7 @@ public class SharpCartUser {
 
 	public SharpCartUser()
 	{
-		
+
 	}
 
 	/**
@@ -152,7 +154,12 @@ public class SharpCartUser {
 	 * @param activeShoppingList the activeShoppingList to set
 	 */
 	public void setActiveShoppingList(Set<UserShoppingItem> activeShoppingList) {
-		this.activeShoppingList = activeShoppingList;
+		this.activeShoppingList = new HashSet<UserShoppingItem>();
+		
+		while (activeShoppingList.iterator().hasNext())
+		{
+			this.activeShoppingList.add(activeShoppingList.iterator().next());
+		}
 	}
 
 	/**
@@ -167,5 +174,16 @@ public class SharpCartUser {
 	 */
 	public void setActiveShoppingListLastUpdate(Date activeShoppingListLastUpdate) {
 		this.activeShoppingListLastUpdate = activeShoppingListLastUpdate;
+	}
+	
+	public boolean clearSet()
+	{
+		//this.activeShoppingList.clear();
+		while (activeShoppingList.iterator().hasNext())
+		{
+			activeShoppingList.remove(activeShoppingList.iterator().next());
+		}
+		
+		return this.activeShoppingList.isEmpty();
 	}
 }

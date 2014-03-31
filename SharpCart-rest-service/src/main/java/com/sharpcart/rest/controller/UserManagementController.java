@@ -120,7 +120,7 @@ public class UserManagementController {
 		  	  final List<Store> storeList = query.list();	
 		  	  DAO.getInstance().commit();
 			  
-		  	  final Set<Store> userStores = new HashSet<Store>();
+		  	  final HashSet<Store> userStores = new HashSet<Store>();
 		  	  
 		  	  for (final String storeId : stores)
 		  	  {
@@ -293,7 +293,7 @@ public class UserManagementController {
 								final List<Store> storeList = query.list();	
 								DAO.getInstance().commit();
 							  
-								final Set<Store> userStores = new HashSet<Store>();
+								final HashSet<Store> userStores = new HashSet<Store>();
 							  
 								for (final String storeId : stores)
 								{
@@ -422,9 +422,10 @@ public class UserManagementController {
     		{
     			//convert a ShoppingListItem into a UserShoppingItem
     			UserShoppingItem userShoppingItem = new UserShoppingItem();
+    			ShoppingItem shoppingItem = new ShoppingItem();
     			
     			userShoppingItem.setQuantity(item.getQuantity()); //set quantity
-    			userShoppingItem.setUser(user);
+    			userShoppingItem.setUser(user); //set user
     			
     			//find a shopping item in the database using the item id
     			
@@ -432,7 +433,7 @@ public class UserManagementController {
     				DAO.getInstance().begin();
     				query = DAO.getInstance().getSession().createQuery("from ShoppingItem where id = :shoppingItemId");
     				query.setLong("shoppingItemId", item.getId());
-    				ShoppingItem shoppingItem = (ShoppingItem)query.uniqueResult();
+    				shoppingItem = (ShoppingItem)query.uniqueResult();
     				DAO.getInstance().commit();
     				
     				userShoppingItem.setShoppingItem(shoppingItem);
@@ -448,12 +449,18 @@ public class UserManagementController {
     			
     			//add user shopping item to set
     			tempShoppingItemSet.add(userShoppingItem);
+    			
+    			//debug
+    			LOG.info("Temp Shopping Item Set Size : "+tempShoppingItemSet.size()); 
     		}
     		
     		//update user active sharp list and the returned synced sharp list
-    		user.getActiveShoppingList().clear();   		
+    		user.clearSet();
     		user.setActiveShoppingList(tempShoppingItemSet);
     		
+			//debug
+			LOG.info("User Shopping Item Set Size : "+user.getActiveShoppingList().size()); 
+			
     		syncedSharpList.setMainSharpList(sharpList.getMainSharpList());
     		
     		//try {

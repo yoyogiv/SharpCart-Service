@@ -131,7 +131,7 @@ public class UserShoppingItem implements Comparable<UserShoppingItem>{
 			if (other.user != null)
 				return false;
 			
-		} else if (!user.getId().equals(other.user.getUserName()))
+		} else if (!user.getUserName().equals(other.user.getUserName()))
 			return false;
 		
 		return true;

@@ -44,8 +44,8 @@ public class UsersUnitTest {
   @Before
   public void setupUnitUnderTest() {
 	  try {
-		DAO.getInstance().begin();
-		
+		  
+		DAO.getInstance().begin();	
 		final Query query = DAO.getInstance().getSession().createQuery("from Store");
 		final List<Store> storeList = query.list();
 		
@@ -86,7 +86,7 @@ public class UsersUnitTest {
 	  user.setUserInformationLastUpdate(new Date());
 	  
 	  //create a demo active sharp list
-	  Set<UserShoppingItem> demoSharpList = new HashSet<UserShoppingItem>();
+	  HashSet<UserShoppingItem> demoSharpList = new HashSet<UserShoppingItem>();
 	  
 	  UserShoppingItem item1 = new UserShoppingItem();
 	  UserShoppingItem item2 = new UserShoppingItem();
@@ -182,7 +182,6 @@ public class UsersUnitTest {
 	  user.setUserInformationLastUpdate(new Date());
 	  
 	  //create a demo active sharp list
-	  /*
 	  Set<UserShoppingItem> demoSharpList = new HashSet<UserShoppingItem>();
 	  
 	  UserShoppingItem item1 = new UserShoppingItem();
@@ -194,7 +193,7 @@ public class UsersUnitTest {
 	  try{
 		  DAO.getInstance().begin();
 		  query = DAO.getInstance().getSession().createQuery("from ShoppingItem where id = :shoppingItemId");
-		  query.setLong("shoppingItemId", 3);
+		  query.setLong("shoppingItemId", 35);
 		  final ShoppingItem item1_ShoppingItem = (ShoppingItem)query.uniqueResult();
 		  DAO.getInstance().commit();
 		  
@@ -209,16 +208,19 @@ public class UsersUnitTest {
 	  }
 	  
 	  demoSharpList.add(item1);
-	  */
 	  
-	  //update user active sharp list
-	  user.getActiveShoppingList().clear();
+	  //update user active sharp list  
+	  assertFalse(!user.clearSet());
+	  user.setActiveShoppingList(demoSharpList);
 	  user.setActiveShoppingListLastUpdate(new Date());
 	  
 	  //Update user in database
 	  DAO.getInstance().begin();
 	  DAO.getInstance().getSession().update(user);
 	  DAO.getInstance().commit();
+	  
+	  //make sure that our user is null before we get it again from the database
+	  user = null;
 	  
 	  //Validate that user no longer has removed store
 	  DAO.getInstance().begin();
@@ -230,8 +232,9 @@ public class UsersUnitTest {
 	  stores = user.getStores();
 	  assertFalse(stores.contains(storeToRemove));
 	  
-	  //validate that user no longer has items in their active sharp list
-	  assertEquals(0,user.getActiveShoppingList().size());
+	  //validate that user now only has one item in their list
+	  assertEquals(1,user.getActiveShoppingList().size());
+	  assertEquals(35, ((UserShoppingItem)user.getActiveShoppingList().iterator().next()).getShoppingItem().getId().longValue());
 	  
 	  DAO.getInstance().close();
 
