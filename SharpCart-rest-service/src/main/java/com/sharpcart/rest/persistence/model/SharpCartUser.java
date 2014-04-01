@@ -35,7 +35,9 @@ public class SharpCartUser {
 	
 	private Date	userInformationLastUpdate;
 	
-	private Set<UserShoppingItem> activeShoppingList;
+	private Set<UserShoppingItem> regularShoppingItems;
+	
+	private Set<UserExtraShoppingItem> extraShoppingItems;
 	
 	private Date	activeShoppingListLastUpdate;	
 
@@ -146,20 +148,42 @@ public class SharpCartUser {
 	 * @return the activeShoppingList
 	 */
 	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true,mappedBy = "user")
-	public Set<UserShoppingItem> getActiveShoppingList() {
-		return activeShoppingList;
+	public Set<UserShoppingItem> getRegularShoppingItems() {
+		return regularShoppingItems;
 	}
 
 	/**
 	 * @param activeShoppingList the activeShoppingList to set
 	 */
-	public void setActiveShoppingList(Set<UserShoppingItem> activeShoppingList) {
-		if (this.activeShoppingList==null)
-			this.activeShoppingList = activeShoppingList;
+	public void setRegularShoppingItems(Set<UserShoppingItem> activeShoppingList) {
+		if (this.regularShoppingItems==null)
+			this.regularShoppingItems = activeShoppingList;
 		else
 		{
-			this.activeShoppingList.clear();
-			this.activeShoppingList.addAll(activeShoppingList);
+			this.regularShoppingItems.clear();
+			this.regularShoppingItems.addAll(activeShoppingList);
+		}
+	}
+
+	
+	/**
+	 * @return the extraShoppingItems
+	 */
+	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true,mappedBy = "user")
+	public Set<UserExtraShoppingItem> getExtraShoppingItems() {
+		return extraShoppingItems;
+	}
+
+	/**
+	 * @param extraShoppingItems the extraShoppingItems to set
+	 */
+	public void setExtraShoppingItems(Set<UserExtraShoppingItem> extraShoppingItems) {
+		if (this.extraShoppingItems==null)
+			this.extraShoppingItems = extraShoppingItems;
+		else
+		{
+			this.extraShoppingItems.clear();
+			this.extraShoppingItems.addAll(extraShoppingItems);
 		}
 	}
 
@@ -179,12 +203,16 @@ public class SharpCartUser {
 	
 	public boolean clearSet()
 	{
-		//this.activeShoppingList.clear();
-		while (activeShoppingList.iterator().hasNext())
+		while (regularShoppingItems.iterator().hasNext())
 		{
-			activeShoppingList.remove(activeShoppingList.iterator().next());
+			regularShoppingItems.remove(regularShoppingItems.iterator().next());
 		}
 		
-		return this.activeShoppingList.isEmpty();
+		while (extraShoppingItems.iterator().hasNext())
+		{
+			extraShoppingItems.remove(extraShoppingItems.iterator().next());
+		}
+		
+		return (this.regularShoppingItems.isEmpty()&&this.extraShoppingItems.isEmpty());
 	}
 }
