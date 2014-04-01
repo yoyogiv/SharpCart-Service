@@ -252,7 +252,7 @@ public class UsersUnitTest {
 	  SharpCartUser user = (SharpCartUser)query.uniqueResult();
 	  DAO.getInstance().commit();
 	  
-	  //Delte user from database
+	  //Delete user from database
 	  if (user!=null)
 	  {
 		  DAO.getInstance().begin();

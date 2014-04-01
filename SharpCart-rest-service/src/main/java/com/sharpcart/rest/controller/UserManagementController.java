@@ -410,13 +410,7 @@ public class UserManagementController {
     		//if it is newer, return database version to device
     		
     		//if it is older, update database with device version and delete any older information
-    		if (user.getActiveShoppingList()!=null)
-    		{
-    			tempShoppingItemSet = user.getActiveShoppingList();
-    		} else
-    		{
-    			tempShoppingItemSet = new HashSet<UserShoppingItem>();
-    		}
+    		tempShoppingItemSet = new HashSet<UserShoppingItem>();
     		
     		for (ShoppingListItem item : sharpList.getMainSharpList())
     		{
@@ -455,7 +449,10 @@ public class UserManagementController {
     		}
     		
     		//update user active sharp list and the returned synced sharp list
-    		user.clearSet();
+    		//user.clearSet();
+    		
+			//debug
+			LOG.info("Temp Shopping Item Set Size : "+tempShoppingItemSet.size()); 
     		user.setActiveShoppingList(tempShoppingItemSet);
     		
 			//debug

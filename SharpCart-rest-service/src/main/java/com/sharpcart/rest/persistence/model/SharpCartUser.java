@@ -154,12 +154,17 @@ public class SharpCartUser {
 	 * @param activeShoppingList the activeShoppingList to set
 	 */
 	public void setActiveShoppingList(Set<UserShoppingItem> activeShoppingList) {
-		this.activeShoppingList = new HashSet<UserShoppingItem>();
 		
+		this.activeShoppingList = new HashSet<UserShoppingItem>();
+		this.activeShoppingList = activeShoppingList;
+		
+		/*
 		while (activeShoppingList.iterator().hasNext())
 		{
 			this.activeShoppingList.add(activeShoppingList.iterator().next());
 		}
+		*/
+		
 	}
 
 	/**
