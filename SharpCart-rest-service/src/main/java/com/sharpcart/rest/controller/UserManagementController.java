@@ -406,84 +406,99 @@ public class UserManagementController {
     	if (user!=null)
     	{	
     		//check if database user sharplist is newer or older than device version
-    		
-    		//if it is newer, return database version to device
-    		
-    		//if it is older, update database with device version and delete any older information
-    		tempShoppingItemSet = new HashSet<UserShoppingItem>();
-    		
-    		for (ShoppingListItem item : sharpList.getMainSharpList())
-    		{
-    			//convert a ShoppingListItem into a UserShoppingItem
-    			UserShoppingItem userShoppingItem = new UserShoppingItem();
-    			ShoppingItem shoppingItem = new ShoppingItem();
-    			
-    			userShoppingItem.setQuantity(item.getQuantity()); //set quantity
-    			userShoppingItem.setUser(user); //set user
-    			
-    			//find a shopping item in the database using the item id
-    			
-    			try {
-    				DAO.getInstance().begin();
-    				query = DAO.getInstance().getSession().createQuery("from ShoppingItem where id = :shoppingItemId");
-    				query.setLong("shoppingItemId", item.getId());
-    				shoppingItem = (ShoppingItem)query.uniqueResult();
-    				DAO.getInstance().commit();
-    				
-    				userShoppingItem.setShoppingItem(shoppingItem);
-    			} catch (HibernateException ex)
-    			{
-    				DAO.getInstance().rollback();
-    				ex.printStackTrace();
-    				return syncedSharpList; //if even one of the grocery items can not be saved we need to exit the method
-    			}
-    			
-    			//debug
-    			LOG.info("Shopping Item Name: "+userShoppingItem.getShoppingItem().getName()); 
-    			
-    			//add user shopping item to set
-    			tempShoppingItemSet.add(userShoppingItem);
-    		}
-    		
-    		//update user active sharp list and the returned synced sharp list    		
-    		Assert.isTrue(user.clearSet());
-    		
-			//debug
-			LOG.info("Temp Shopping Item Set Size : "+tempShoppingItemSet.size()); 
-    		user.setActiveShoppingList(tempShoppingItemSet);
-    		
-			//debug
-			LOG.info("User Shopping Item Set Size : "+user.getActiveShoppingList().size()); 
-			
-			//add items from database to returned json 
-    		syncedSharpList.setMainSharpList(sharpList.getMainSharpList());
-    		
-    		//try {
-    			//update user last updated synced shopping list and returned sharp list
-				user.setActiveShoppingListLastUpdate(new Date());
-				syncedSharpList.setLastUpdated(df.format(new Date()));
-				
-			//} catch (ParseException e) {
-				// TODO Auto-generated catch block
-			//	e.printStackTrace();
-			//}
-    		
-    		//Save user to database
     		try {
-    			LOG.info("Updating user after I update the active shopping list");
-    			
-	    		DAO.getInstance().begin();
-	    		DAO.getInstance().getSession().update(user);
-	    		DAO.getInstance().commit();
-    		} catch (HibernateException ex)
-    		{
-    			DAO.getInstance().rollback();
-    			ex.printStackTrace();
-    		}		
+				if (user.getActiveShoppingListLastUpdate().before(df.parse(sharpList.getLastUpdated())))	
+					{
+		    			//if it is older, update database with device version and delete any older information
+		    			tempShoppingItemSet = new HashSet<UserShoppingItem>();
+		    		
+		    			for (ShoppingListItem item : sharpList.getMainSharpList())
+		    			{
+		    				//convert a ShoppingListItem into a UserShoppingItem
+		    				UserShoppingItem userShoppingItem = new UserShoppingItem();
+		    				ShoppingItem shoppingItem = new ShoppingItem();
+		    			
+		    				userShoppingItem.setQuantity(item.getQuantity()); //set quantity
+		    				userShoppingItem.setUser(user); //set user
+		    			
+		    				//find a shopping item in the database using the item id
+		    			
+		    				try {
+		    					DAO.getInstance().begin();
+		    					query = DAO.getInstance().getSession().createQuery("from ShoppingItem where id = :shoppingItemId");
+		    					query.setLong("shoppingItemId", item.getId());
+		    					shoppingItem = (ShoppingItem)query.uniqueResult();
+		    					DAO.getInstance().commit();
+		    				
+		    					userShoppingItem.setShoppingItem(shoppingItem);
+		    				} catch (HibernateException ex)
+		    				{
+		    					DAO.getInstance().rollback();
+		    					ex.printStackTrace();
+		    					return syncedSharpList; //if even one of the grocery items can not be saved we need to exit the method
+		    				}
+		    			
+		    				//add user shopping item to set
+		    				tempShoppingItemSet.add(userShoppingItem);
+		    			}
+		    		
+		    			//update user active sharp list and the returned synced sharp list    		
+		    			Assert.isTrue(user.clearSet());
+		    		
+		    			user.setActiveShoppingList(tempShoppingItemSet);	
+		    			syncedSharpList.setMainSharpList(sharpList.getMainSharpList());
+		    		
+						user.setActiveShoppingListLastUpdate(new Date());
+						syncedSharpList.setLastUpdated(df.format(new Date()));
+		    		
+						//Save user to database
+						try {
+							LOG.info("Updating user after I update the active shopping list");
+		    			
+							DAO.getInstance().begin();
+							DAO.getInstance().getSession().update(user);
+							DAO.getInstance().commit();
+						} catch (HibernateException ex)
+						{
+							DAO.getInstance().rollback();
+							ex.printStackTrace();
+						}		
+					} else //database user sharp list is newer than device
+					{
+						//iterate over database items and generate a list<ShoppingListItem>
+						List<ShoppingListItem> tempShoppingListItemList = new ArrayList<ShoppingListItem>();
+						for (UserShoppingItem userShoppingItem : user.getActiveShoppingList())
+						{
+							ShoppingListItem shoppingListItem = new ShoppingListItem();
+							
+							//copy information from UserShoppingItem into ShoppingListItem
+							shoppingListItem.setQuantity(userShoppingItem.getQuantity()); //quantity
+							shoppingListItem.setId(userShoppingItem.getShoppingItem().getId()); //id
+							shoppingListItem.setName(userShoppingItem.getShoppingItem().getName()); //name
+							shoppingListItem.setDescription(userShoppingItem.getShoppingItem().getDescription()); //description
+							shoppingListItem.setShopping_item_unit_id(userShoppingItem.getShoppingItem().getUnit().getId()); //unit id
+							shoppingListItem.setUnit(userShoppingItem.getShoppingItem().getUnit().getName()); //unit name
+							shoppingListItem.setShopping_item_category_id(userShoppingItem.getShoppingItem().getUnit().getId()); //category id
+							shoppingListItem.setCategory(userShoppingItem.getShoppingItem().getUnit().getName()); //category name
+							
+							//add item to temp list
+							tempShoppingListItemList.add(shoppingListItem);
+						}
+						
+		    			//add items from database to returned json and set time stamp
+		    			syncedSharpList.setMainSharpList(tempShoppingListItemList);
+		    			syncedSharpList.setLastUpdated(df.format(user.getActiveShoppingListLastUpdate()));
+					}
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
     	}
     	
     	DAO.getInstance().close();
     	
     	return syncedSharpList;
     }
+    
+    
 }

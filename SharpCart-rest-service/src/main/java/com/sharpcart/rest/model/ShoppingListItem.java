@@ -22,10 +22,29 @@ public class ShoppingListItem implements Comparable<ShoppingListItem> {
     private boolean is_deleted;
     private boolean best_price_per_unit = false;
     
-    /*
-     * I should create a specific constructor for this object and make the default constructor private so you must 
-     * use it since a shopping item MUST have at least :id,name,description,category and unit for everything to work correctly
-     */
+    public ShoppingListItem()
+    {
+    	this.id=0L;
+    	this.name = "";
+    	this.price_per_unit = 0;
+    	this.quantity = 0;
+    	this.unit = "";
+    	this.category="";
+    	this.description="";
+    	this.shopping_item_category_id = 0L;
+    	this.shopping_item_unit_id = 0L;
+    	this.conversion_ratio = -1;
+    	this.price = 0;
+    	this.total_price = 0;
+    	this.package_quantity =0;
+    	this.default_unit_in_db = "";
+    	this.is_using_default_unit ="";
+    	this.in_db="";
+    	this.in_cart = false;
+    	this.image_location="/ShoppingItem/images/default.png";
+    	this.is_deleted = false;
+    	this.best_price_per_unit = false;
+    }
 
 	@Override
     public int compareTo(final ShoppingListItem arg0) {
