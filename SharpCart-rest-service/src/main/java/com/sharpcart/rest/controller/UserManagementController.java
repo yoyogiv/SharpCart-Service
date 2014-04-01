@@ -480,6 +480,8 @@ public class UserManagementController {
 							shoppingListItem.setUnit(userShoppingItem.getShoppingItem().getUnit().getName()); //unit name
 							shoppingListItem.setShopping_item_category_id(userShoppingItem.getShoppingItem().getUnit().getId()); //category id
 							shoppingListItem.setCategory(userShoppingItem.getShoppingItem().getUnit().getName()); //category name
+							shoppingListItem.setConversion_ratio(userShoppingItem.getShoppingItem().getId()); //conversion ratio
+							shoppingListItem.setImage_location(userShoppingItem.getShoppingItem().getImageLocation()); //image location
 							
 							//add item to temp list
 							tempShoppingListItemList.add(shoppingListItem);
