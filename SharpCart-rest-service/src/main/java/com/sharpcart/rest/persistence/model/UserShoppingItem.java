@@ -23,8 +23,8 @@ public class UserShoppingItem implements Comparable<UserShoppingItem>{
 	
 	public UserShoppingItem()
 	{
-		shoppingItem = new ShoppingItem();
-		user = new SharpCartUser();
+		//shoppingItem = new ShoppingItem();
+		//user = new SharpCartUser();
 	}
 
 	/**

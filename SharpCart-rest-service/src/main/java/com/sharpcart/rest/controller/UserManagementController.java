@@ -443,13 +443,10 @@ public class UserManagementController {
     			
     			//add user shopping item to set
     			tempShoppingItemSet.add(userShoppingItem);
-    			
-    			//debug
-    			LOG.info("Temp Shopping Item Set Size : "+tempShoppingItemSet.size()); 
     		}
     		
-    		//update user active sharp list and the returned synced sharp list
-    		//user.clearSet();
+    		//update user active sharp list and the returned synced sharp list    		
+    		Assert.isTrue(user.clearSet());
     		
 			//debug
 			LOG.info("Temp Shopping Item Set Size : "+tempShoppingItemSet.size()); 
@@ -458,6 +455,7 @@ public class UserManagementController {
 			//debug
 			LOG.info("User Shopping Item Set Size : "+user.getActiveShoppingList().size()); 
 			
+			//add items from database to returned json 
     		syncedSharpList.setMainSharpList(sharpList.getMainSharpList());
     		
     		//try {
@@ -481,8 +479,7 @@ public class UserManagementController {
     		{
     			DAO.getInstance().rollback();
     			ex.printStackTrace();
-    		}
-    		
+    		}		
     	}
     	
     	DAO.getInstance().close();

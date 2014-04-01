@@ -41,7 +41,7 @@ public class SharpCartUser {
 
 	public SharpCartUser()
 	{
-
+		//this.activeShoppingList = new HashSet<UserShoppingItem>();
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class SharpCartUser {
 	/**
 	 * @return the activeShoppingList
 	 */
-	@OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
+	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true,mappedBy = "user")
 	public Set<UserShoppingItem> getActiveShoppingList() {
 		return activeShoppingList;
 	}
@@ -154,17 +154,13 @@ public class SharpCartUser {
 	 * @param activeShoppingList the activeShoppingList to set
 	 */
 	public void setActiveShoppingList(Set<UserShoppingItem> activeShoppingList) {
-		
-		this.activeShoppingList = new HashSet<UserShoppingItem>();
-		this.activeShoppingList = activeShoppingList;
-		
-		/*
-		while (activeShoppingList.iterator().hasNext())
+		if (this.activeShoppingList==null)
+			this.activeShoppingList = activeShoppingList;
+		else
 		{
-			this.activeShoppingList.add(activeShoppingList.iterator().next());
+			this.activeShoppingList.clear();
+			this.activeShoppingList.addAll(activeShoppingList);
 		}
-		*/
-		
 	}
 
 	/**

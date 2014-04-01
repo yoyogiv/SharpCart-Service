@@ -136,11 +136,13 @@ public class UsersUnitTest {
 	  DAO.getInstance().getSession().save(user);
 	  DAO.getInstance().commit();
 	  
+	  DAO.getInstance().close();
+	  
 	  //Validate that user was added
 	  DAO.getInstance().begin();
 	  query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
 	  query.setString("userName", "testUser@gmail.com");
-	  final SharpCartUser user = (SharpCartUser)query.uniqueResult();
+	  SharpCartUser user = (SharpCartUser)query.uniqueResult();
 	  DAO.getInstance().commit();
 	  
 	  assertNotNull(user);
@@ -218,9 +220,6 @@ public class UsersUnitTest {
 	  DAO.getInstance().begin();
 	  DAO.getInstance().getSession().update(user);
 	  DAO.getInstance().commit();
-	  
-	  //make sure that our user is null before we get it again from the database
-	  user = null;
 	  
 	  //Validate that user no longer has removed store
 	  DAO.getInstance().begin();
