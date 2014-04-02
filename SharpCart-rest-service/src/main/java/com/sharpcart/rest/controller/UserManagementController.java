@@ -134,7 +134,7 @@ public class UserManagementController {
 		  		  }
 		  	  }
 		  	  
-		  	  persistanceUser.setStores(userStores);
+		  	  persistanceUser.addStores(userStores);
 		  	  
 		  	  if (!jsonUser.getLastUpdated().equals(new Date(0)))
 		  	  {
@@ -164,9 +164,6 @@ public class UserManagementController {
 	  	//close session
 	  	DAO.getInstance().close();
 	  	
-	  	//debug
-    	LOG.info("Return Code: "+result); 
-    	
     	return result;
     }
     
@@ -307,7 +304,7 @@ public class UserManagementController {
 									}
 								}
 							  
-								user.setStores(userStores);
+								user.addStores(userStores);
 							  
 								user.setUserInformationLastUpdate(new Date());
 								
@@ -421,7 +418,6 @@ public class UserManagementController {
 		    				ShoppingItem shoppingItem = new ShoppingItem();
 		    			
 		    				userShoppingItem.setQuantity(item.getQuantity()); //set quantity
-		    				//userShoppingItem.setUser(user); //set user
 		    			
 		    				//find a shopping item in the database using the item id
 		    				if (!item.getCategory().equalsIgnoreCase("extra")) //check if this is an "extra" item
@@ -458,7 +454,6 @@ public class UserManagementController {
 		    					userExtraShoppingItem.setCategory("extra");
 		    					userExtraShoppingItem.setImageLocation(item.getImage_location());
 		    					userExtraShoppingItem.setQuantity(item.getQuantity());
-		    					//userExtraShoppingItem.setUser(user);
 		    					  
 		    					tempExtraItemSet.add(userExtraShoppingItem);  
 		    				}
@@ -467,8 +462,8 @@ public class UserManagementController {
 		    			//update user active sharp list and the returned synced sharp list
 		    			Assert.isTrue(user.clearSet());
 		    		
-		    			//user.setRegularShoppingItems(tempShoppingItemSet);
-		    			//user.setExtraShoppingItems(tempExtraItemSet);
+		    			user.addRegularShoppingItem(tempShoppingItemSet);
+		    			user.addExtraShoppingItem(tempExtraItemSet);
 		    			
 		    			syncedSharpList.setMainSharpList(sharpList.getMainSharpList());
 		    			
@@ -522,12 +517,7 @@ public class UserManagementController {
 							extraShoppingListItem.setQuantity(userExtraShoppingItem.getQuantity()); //quantity
 							extraShoppingListItem.setId(userExtraShoppingItem.getId()); //id
 							extraShoppingListItem.setName(userExtraShoppingItem.getName()); //name
-							extraShoppingListItem.setDescription(userExtraShoppingItem.getName());//description
-							
-							//shoppingListItem.setDescription(userShoppingItem.getShoppingItem().getDescription()); //description
-							//shoppingListItem.setShopping_item_unit_id(userShoppingItem.getShoppingItem().getUnit().getId()); //unit id
-							//shoppingListItem.setUnit(userShoppingItem.getShoppingItem().getUnit().getName()); //unit name
-							
+							extraShoppingListItem.setDescription(userExtraShoppingItem.getName());//description			
 							extraShoppingListItem.setShopping_item_category_id(23L); //category id
 							extraShoppingListItem.setCategory("extra"); //category name
 							extraShoppingListItem.setConversion_ratio(-1); //conversion ratio

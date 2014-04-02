@@ -76,8 +76,18 @@ public class SharpCartUser {
 	/**
 	 * @param stores the stores to set
 	 */
-	public void setStores(Set<Store> stores) {
+	private void setStores(Set<Store> stores) {
 		this.stores = stores;
+	}
+	
+	public void addStores(Store store)
+	{
+		this.getStores().add(store);
+	}
+	
+	public void addStores(Set<Store> stores)
+	{
+		this.getStores().addAll(stores);
 	}
 
 	/**
@@ -147,7 +157,7 @@ public class SharpCartUser {
 	/**
 	 * @return the set of regular shopping items currently inside the user sharp list
 	 */
-	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true/*,mappedBy = "user"*/)
+	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true)
     @JoinTable(name = "UserSharpListRegularItems", joinColumns = {
             @JoinColumn(name = "userId")}, inverseJoinColumns = {
             @JoinColumn(name = "userRegularShoppingItemId")})
@@ -167,11 +177,16 @@ public class SharpCartUser {
 		this.getRegularShoppingItems().add(userRegularShoppingItem);
 	}
 	
+	public void addRegularShoppingItem(Set<UserShoppingItem> userRegularShoppingItem)
+	{
+		this.getRegularShoppingItems().addAll(userRegularShoppingItem);
+	}
+	
 	/**
 	 * @return the extraShoppingItems currently inside the user sharp list
 	 */
 	
-	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true/*,mappedBy = "user"*/)
+	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true)
     @JoinTable(name = "UserSharpListExtraItems", joinColumns = {
             @JoinColumn(name = "userId")}, inverseJoinColumns = {
             @JoinColumn(name = "userExtraShoppingItemId")})
@@ -190,6 +205,11 @@ public class SharpCartUser {
 	public void addExtraShoppingItem(UserExtraShoppingItem userExtraShoppingItem)
 	{
 		this.getExtraShoppingItems().add(userExtraShoppingItem);
+	}
+	
+	public void addExtraShoppingItem(Set<UserExtraShoppingItem> userExtraShoppingItem)
+	{
+		this.getExtraShoppingItems().addAll(userExtraShoppingItem);
 	}
 	
 	/**
