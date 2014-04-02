@@ -42,8 +42,10 @@ public class SharpCartUser {
 	private Date	activeShoppingListLastUpdate;	
 
 	public SharpCartUser()
-	{
-		//this.activeShoppingList = new HashSet<UserShoppingItem>();
+	{	
+		this.regularShoppingItems = new HashSet<UserShoppingItem>();
+		this.extraShoppingItems = new HashSet<UserExtraShoppingItem>();	
+		this.stores = new HashSet<Store>();
 	}
 
 	/**
@@ -61,8 +63,6 @@ public class SharpCartUser {
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-
 
 	/**
 	 * @return the stores
@@ -145,48 +145,53 @@ public class SharpCartUser {
 	}
 
 	/**
-	 * @return the activeShoppingList
+	 * @return the set of regular shopping items currently inside the user sharp list
 	 */
-	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true,mappedBy = "user")
+	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true/*,mappedBy = "user"*/)
+    @JoinTable(name = "UserSharpListRegularItems", joinColumns = {
+            @JoinColumn(name = "userId")}, inverseJoinColumns = {
+            @JoinColumn(name = "userRegularShoppingItemId")})
 	public Set<UserShoppingItem> getRegularShoppingItems() {
 		return regularShoppingItems;
 	}
 
 	/**
-	 * @param activeShoppingList the activeShoppingList to set
+	 * @param regularShoppingItems the regularShoppingItems to set
 	 */
-	public void setRegularShoppingItems(Set<UserShoppingItem> activeShoppingList) {
-		if (this.regularShoppingItems==null)
-			this.regularShoppingItems = activeShoppingList;
-		else
-		{
-			this.regularShoppingItems.clear();
-			this.regularShoppingItems.addAll(activeShoppingList);
-		}
+	private void setRegularShoppingItems(Set<UserShoppingItem> regularShoppingItems) {
+		this.regularShoppingItems = regularShoppingItems;
 	}
 
+	public void addRegularShoppingItem(UserShoppingItem userRegularShoppingItem)
+	{
+		this.getRegularShoppingItems().add(userRegularShoppingItem);
+	}
 	
 	/**
-	 * @return the extraShoppingItems
+	 * @return the extraShoppingItems currently inside the user sharp list
 	 */
-	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true,mappedBy = "user")
+	
+	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true/*,mappedBy = "user"*/)
+    @JoinTable(name = "UserSharpListExtraItems", joinColumns = {
+            @JoinColumn(name = "userId")}, inverseJoinColumns = {
+            @JoinColumn(name = "userExtraShoppingItemId")})
 	public Set<UserExtraShoppingItem> getExtraShoppingItems() {
 		return extraShoppingItems;
 	}
-
+	
 	/**
 	 * @param extraShoppingItems the extraShoppingItems to set
 	 */
-	public void setExtraShoppingItems(Set<UserExtraShoppingItem> extraShoppingItems) {
-		if (this.extraShoppingItems==null)
-			this.extraShoppingItems = extraShoppingItems;
-		else
-		{
-			this.extraShoppingItems.clear();
-			this.extraShoppingItems.addAll(extraShoppingItems);
-		}
+	
+	private void setExtraShoppingItems(Set<UserExtraShoppingItem> extraShoppingItems) {
+		this.extraShoppingItems = extraShoppingItems;
 	}
-
+	
+	public void addExtraShoppingItem(UserExtraShoppingItem userExtraShoppingItem)
+	{
+		this.getExtraShoppingItems().add(userExtraShoppingItem);
+	}
+	
 	/**
 	 * @return the activeShoppingListLastUpdate
 	 */
@@ -208,11 +213,13 @@ public class SharpCartUser {
 			regularShoppingItems.remove(regularShoppingItems.iterator().next());
 		}
 		
+		
 		while (extraShoppingItems.iterator().hasNext())
 		{
 			extraShoppingItems.remove(extraShoppingItems.iterator().next());
 		}
 		
-		return (this.regularShoppingItems.isEmpty()&&this.extraShoppingItems.isEmpty());
+		
+		return this.regularShoppingItems.isEmpty()&&this.extraShoppingItems.isEmpty();
 	}
 }

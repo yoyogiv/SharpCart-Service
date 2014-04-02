@@ -145,7 +145,7 @@ public class UserManagementController {
 		  		  persistanceUser.setUserInformationLastUpdate(new Date());
 		  	  }
 		  	  
-		  	  persistanceUser.setRegularShoppingItems(null);
+		  	  //persistanceUser.setRegularShoppingItems(null);
 		  	  persistanceUser.setActiveShoppingListLastUpdate(null);
 		  	  
 		  	  //save user into database
@@ -387,7 +387,7 @@ public class UserManagementController {
     	Query query;
     	SharpCartUser user = null;
     	SharpList syncedSharpList = sharpList; //we start by assuming that there will be no need to update the user sharp list on the device
-    	Set<UserShoppingItem> tempShoppingItemSet;
+    	Set<UserShoppingItem> tempShoppingItemSet = new HashSet<UserShoppingItem>();
     	Set<UserExtraShoppingItem> tempExtraItemSet = new HashSet<UserExtraShoppingItem>();
     	
     	//get user from database
@@ -411,10 +411,9 @@ public class UserManagementController {
     		try {
 				if (user.getActiveShoppingListLastUpdate().before(df.parse(sharpList.getLastUpdated())))	
 					{
-		    			//if it is older, update database with device version and delete any older information
-		    			tempShoppingItemSet = new HashSet<UserShoppingItem>();
-  					  	
-  					  	
+						LOG.info("Database user sharp list is older than device, updating database");
+					
+		    			//if it is older, update database with device version and delete any older information				  	
 		    			for (ShoppingListItem item : sharpList.getMainSharpList())
 		    			{
 		    				//convert a ShoppingListItem into a UserShoppingItem
@@ -422,11 +421,13 @@ public class UserManagementController {
 		    				ShoppingItem shoppingItem = new ShoppingItem();
 		    			
 		    				userShoppingItem.setQuantity(item.getQuantity()); //set quantity
-		    				userShoppingItem.setUser(user); //set user
+		    				//userShoppingItem.setUser(user); //set user
 		    			
 		    				//find a shopping item in the database using the item id
 		    				if (!item.getCategory().equalsIgnoreCase("extra")) //check if this is an "extra" item
 		    				{
+		    					LOG.info("Regular Item Name: "+item.getName());
+		    					
 			    				try {
 			    					DAO.getInstance().begin();
 			    					query = DAO.getInstance().getSession().createQuery("from ShoppingItem where id = :shoppingItemId");
@@ -438,6 +439,7 @@ public class UserManagementController {
 			    					
 				    				//add user shopping item to set
 				    				tempShoppingItemSet.add(userShoppingItem);
+				    				
 			    				} catch (HibernateException ex)
 			    				{
 			    					DAO.getInstance().rollback();
@@ -446,24 +448,27 @@ public class UserManagementController {
 			    				}
 		    				} else //this is an extra item
 		    				{
+		    					LOG.info("Extra Item Name: "+item.getName());
+		    					
 		    					UserExtraShoppingItem userExtraShoppingItem = new UserExtraShoppingItem();
-		
-		    					userExtraShoppingItem.setName("Love");
+		    					
+		    					userExtraShoppingItem.setId(item.getId());
+		    					userExtraShoppingItem.setName(item.getName());
 		    					userExtraShoppingItem.setCategoryId(23);
 		    					userExtraShoppingItem.setCategory("extra");
-		    					userExtraShoppingItem.setImageLocation("/ShoppingItems/Images/Extra.jpg");
-		    					userExtraShoppingItem.setQuantity(1);
-		    					userExtraShoppingItem.setUser(user);
+		    					userExtraShoppingItem.setImageLocation(item.getImage_location());
+		    					userExtraShoppingItem.setQuantity(item.getQuantity());
+		    					//userExtraShoppingItem.setUser(user);
 		    					  
 		    					tempExtraItemSet.add(userExtraShoppingItem);  
 		    				}
 		    			}
 		    		
-		    			//update user active sharp list and the returned synced sharp list    		
+		    			//update user active sharp list and the returned synced sharp list
 		    			Assert.isTrue(user.clearSet());
 		    		
-		    			user.setRegularShoppingItems(tempShoppingItemSet);
-		    			user.setExtraShoppingItems(tempExtraItemSet);
+		    			//user.setRegularShoppingItems(tempShoppingItemSet);
+		    			//user.setExtraShoppingItems(tempExtraItemSet);
 		    			
 		    			syncedSharpList.setMainSharpList(sharpList.getMainSharpList());
 		    			
@@ -472,8 +477,6 @@ public class UserManagementController {
 		    		
 						//Save user to database
 						try {
-							LOG.info("Updating user after I update the active shopping list");
-		    			
 							DAO.getInstance().begin();
 							DAO.getInstance().getSession().update(user);
 							DAO.getInstance().commit();
@@ -484,8 +487,12 @@ public class UserManagementController {
 						}		
 					} else //database user sharp list is newer than device
 					{
+						LOG.info("Database user sharp list is newer than device, updating device");
+						
 						//iterate over database items and generate a list<ShoppingListItem>
 						List<ShoppingListItem> tempShoppingListItemList = new ArrayList<ShoppingListItem>();
+						
+						//start with regular items
 						for (UserShoppingItem userShoppingItem : user.getRegularShoppingItems())
 						{
 							ShoppingListItem shoppingListItem = new ShoppingListItem();
@@ -497,13 +504,37 @@ public class UserManagementController {
 							shoppingListItem.setDescription(userShoppingItem.getShoppingItem().getDescription()); //description
 							shoppingListItem.setShopping_item_unit_id(userShoppingItem.getShoppingItem().getUnit().getId()); //unit id
 							shoppingListItem.setUnit(userShoppingItem.getShoppingItem().getUnit().getName()); //unit name
-							shoppingListItem.setShopping_item_category_id(userShoppingItem.getShoppingItem().getUnit().getId()); //category id
-							shoppingListItem.setCategory(userShoppingItem.getShoppingItem().getUnit().getName()); //category name
+							shoppingListItem.setShopping_item_category_id(userShoppingItem.getShoppingItem().getCategory().getId()); //category id
+							shoppingListItem.setCategory(userShoppingItem.getShoppingItem().getCategory().getName()); //category name
 							shoppingListItem.setConversion_ratio(userShoppingItem.getShoppingItem().getId()); //conversion ratio
 							shoppingListItem.setImage_location(userShoppingItem.getShoppingItem().getImageLocation()); //image location
 							
 							//add item to temp list
 							tempShoppingListItemList.add(shoppingListItem);
+						}
+						
+						//than look for extra items
+						for (UserExtraShoppingItem userExtraShoppingItem : user.getExtraShoppingItems())
+						{
+							ShoppingListItem extraShoppingListItem = new ShoppingListItem();
+							
+							//copy information from UserShoppingItem into ShoppingListItem
+							extraShoppingListItem.setQuantity(userExtraShoppingItem.getQuantity()); //quantity
+							extraShoppingListItem.setId(userExtraShoppingItem.getId()); //id
+							extraShoppingListItem.setName(userExtraShoppingItem.getName()); //name
+							extraShoppingListItem.setDescription(userExtraShoppingItem.getName());//description
+							
+							//shoppingListItem.setDescription(userShoppingItem.getShoppingItem().getDescription()); //description
+							//shoppingListItem.setShopping_item_unit_id(userShoppingItem.getShoppingItem().getUnit().getId()); //unit id
+							//shoppingListItem.setUnit(userShoppingItem.getShoppingItem().getUnit().getName()); //unit name
+							
+							extraShoppingListItem.setShopping_item_category_id(23L); //category id
+							extraShoppingListItem.setCategory("extra"); //category name
+							extraShoppingListItem.setConversion_ratio(-1); //conversion ratio
+							extraShoppingListItem.setImage_location(userExtraShoppingItem.getImageLocation()); //image location
+							
+							//add item to temp list
+							tempShoppingListItemList.add(extraShoppingListItem);
 						}
 						
 		    			//add items from database to returned json and set time stamp

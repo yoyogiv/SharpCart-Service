@@ -57,7 +57,6 @@ public class UsersUnitTest {
 			if (store!=null)
 			{
 				stores.add(store);
-				System.out.println("Store Name: "+store.getName());
 			}
 		}
 	  } catch (final HibernateException ex)
@@ -79,6 +78,7 @@ public class UsersUnitTest {
 	  
 	  //init user
 	  user = new SharpCartUser();
+	  
 	  user.setUserName("testUser@gmail.com");
 	  user.setPassword("123456");
 	  user.setZip("78681");
@@ -86,15 +86,12 @@ public class UsersUnitTest {
 	  user.setStores(stores);
 	  user.setUserInformationLastUpdate(new Date());
 	  
-	  //create a demo active sharp list
-	  HashSet<UserShoppingItem> demoSharpList = new HashSet<UserShoppingItem>();
-	  
+	  //create some regular user shopping items
 	  UserShoppingItem item1 = new UserShoppingItem();
 	  UserShoppingItem item2 = new UserShoppingItem();
 	  
 	  //init item-1
 	  item1.setQuantity(1);
-	  item1.setUser(user);
 	  
 	  try{
 		  DAO.getInstance().begin();
@@ -114,73 +111,75 @@ public class UsersUnitTest {
 	  
 	  //init item-2
 	  item2.setQuantity(1);
-	  item2.setUser(user);
 	  
-	  DAO.getInstance().begin();
-	  query = DAO.getInstance().getSession().createQuery("from ShoppingItem where id = :shoppingItemId");
-	  query.setLong("shoppingItemId", 3);
-	  final ShoppingItem item2_ShoppingItem = (ShoppingItem)query.uniqueResult();
-	  DAO.getInstance().commit();
+	  try {
+		  DAO.getInstance().begin();
+		  query = DAO.getInstance().getSession().createQuery("from ShoppingItem where id = :shoppingItemId");
+		  query.setLong("shoppingItemId", 3);
+		  final ShoppingItem item2_ShoppingItem = (ShoppingItem)query.uniqueResult();
+		  DAO.getInstance().commit();
+		  
+		  Assert.notNull(item2_ShoppingItem,"can not add a null item to user active sharp list");
+		  
+		  item2.setShoppingItem(item2_ShoppingItem);
+	  } catch (HibernateException ex)
+	  {
+		ex.printStackTrace();  
+	  }
 	  
-	  Assert.notNull(item2_ShoppingItem,"can not add a null item to user active sharp list");
+	  DAO.getInstance().close();
 	  
-	  item2.setShoppingItem(item2_ShoppingItem);
+	  user.addRegularShoppingItem(item1);
+	  user.addRegularShoppingItem(item2);
+
+	  assertEquals(2, user.getRegularShoppingItems().size());
 	  
-	  demoSharpList.add(item1);
-	  demoSharpList.add(item2);
-	  
-	  user.setRegularShoppingItems(demoSharpList);
-	  
-	  /*
-	  //add an extra item
-	  Set<UserExtraShoppingItem> demoSetOfExtraItems = new HashSet<UserExtraShoppingItem>();
-	  
+	  //add an extra item 
 	  UserExtraShoppingItem userExtraShoppingItem = new UserExtraShoppingItem();
 	  
+	  userExtraShoppingItem.setId(500L);
 	  userExtraShoppingItem.setName("Love");
 	  userExtraShoppingItem.setCategoryId(23);
 	  userExtraShoppingItem.setCategory("extra");
 	  userExtraShoppingItem.setImageLocation("/ShoppingItems/Images/Extra.jpg");
 	  userExtraShoppingItem.setQuantity(1);
-	  userExtraShoppingItem.setUser(user);
 	  
-	  demoSetOfExtraItems.add(userExtraShoppingItem);
+	  user.addExtraShoppingItem(userExtraShoppingItem);
 	  
-	  assertEquals(1,demoSetOfExtraItems.size());
+	  assertEquals(1, user.getExtraShoppingItems().size());
 	  
-	  user.setExtraShoppingItems(demoSetOfExtraItems);
-	  
-	  assertEquals(1,user.getExtraShoppingItems().size());
-	  */
-	  
+	  //update user active shopping list last update time stamp
 	  user.setActiveShoppingListLastUpdate(new Date());
 	  
 	  //Save user to database
-	  DAO.getInstance().begin();
-	  DAO.getInstance().getSession().save(user);
-	  DAO.getInstance().commit();
+	  try{
+		  DAO.getInstance().begin();
+		  DAO.getInstance().getSession().save(user);
+		  DAO.getInstance().commit();
+	  } catch (HibernateException ex)
+	  {
+		  DAO.getInstance().rollback();
+		  ex.printStackTrace();
+	  }
 	  
-	  //DAO.getInstance().close();
-	  
-	  /*
 	  //Validate that user was added
 	  DAO.getInstance().begin();
 	  query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
 	  query.setString("userName", "testUser@gmail.com");
 	  SharpCartUser newUser = (SharpCartUser)query.uniqueResult();
+	  DAO.getInstance().getSession().flush();
 	  DAO.getInstance().commit();
 	  
 	  assertNotNull(newUser);
-	  //assertEquals(1,newUser.getExtraShoppingItems().size());
-	  */
+	  assertEquals(1,newUser.getExtraShoppingItems().size());
+	  assertEquals(2,newUser.getRegularShoppingItems().size());
 	  
-	  DAO.getInstance().close();
+	  DAO.getInstance().close();  
   }
 
   /*
    * Test that we can update a user in the database using hibernate
    */
-  /*
   @Test
   public void updateUserInDatabase() {
 	  
@@ -218,7 +217,6 @@ public class UsersUnitTest {
 	  
 	  //init item-1
 	  item1.setQuantity(1);
-	  item1.setUser(user);
 	  
 	  try{
 		  DAO.getInstance().begin();
@@ -236,18 +234,18 @@ public class UsersUnitTest {
 	  {
 		  ex.printStackTrace();
 	  }
+	 
+	  user.getRegularShoppingItems().clear();
 	  
-	  demoSharpList.add(item1);
+	  user.addRegularShoppingItem(item1);
 	  
-	  //update user active sharp list  
-	  //assertFalse(!user.clearSet());
-	  user.setRegularShoppingItems(demoSharpList);
 	  user.setActiveShoppingListLastUpdate(new Date());
 	  
 	  //Update user in database
 	  DAO.getInstance().begin();
 	  DAO.getInstance().getSession().update(user);
 	  DAO.getInstance().commit();
+	  DAO.getInstance().close();
 	  
 	  //Validate that user no longer has removed store
 	  DAO.getInstance().begin();
@@ -266,12 +264,10 @@ public class UsersUnitTest {
 	  DAO.getInstance().close();
 
   }
-  */
   
   /*
    * Test that we can remove a user from the database using hibernate
    */
-  /*
   @Test
   public void removeUserFromDatabase() {
 	  //Get user from Database
@@ -301,7 +297,5 @@ public class UsersUnitTest {
 	  
 	  //close session
 	  DAO.getInstance().close();
-
   }
-  */
 }

@@ -23,8 +23,6 @@ public class UserExtraShoppingItem {
 	
 	private String imageLocation;
 	
-	private SharpCartUser user;
-	
 	public UserExtraShoppingItem()
 	{
 		
@@ -34,7 +32,6 @@ public class UserExtraShoppingItem {
 	 * @return the id
 	 */
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	public Long getId() {
 		return id;
 	}
@@ -115,23 +112,7 @@ public class UserExtraShoppingItem {
 	public void setImageLocation(String imageLocation) {
 		this.imageLocation = imageLocation;
 	}
-
-	/**
-	 * @return the user
-	 */
-	@ManyToOne
-	@JoinColumn(name="userId",nullable=false)
-	public SharpCartUser getUser() {
-		return user;
-	}
-
-	/**
-	 * @param user the user to set
-	 */
-	public void setUser(SharpCartUser user) {
-		this.user = user;
-	}
-
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -140,7 +121,7 @@ public class UserExtraShoppingItem {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((user == null) ? 0 : user.getUserName().hashCode());
+		//result = prime * result + ((user == null) ? 0 : user.getUserName().hashCode());
 		return result;
 	}
 
@@ -161,11 +142,7 @@ public class UserExtraShoppingItem {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (user == null) {
-			if (other.user != null)
-				return false;
-		} else if (!user.getUserName().equals(other.user.getUserName()))
-			return false;
+		
 		return true;
 	}
 	
