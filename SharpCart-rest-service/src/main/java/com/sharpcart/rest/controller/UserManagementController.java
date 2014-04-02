@@ -473,7 +473,7 @@ public class UserManagementController {
 						//Save user to database
 						try {
 							DAO.getInstance().begin();
-							DAO.getInstance().getSession().update(user);
+							DAO.getInstance().getSession().merge(user);
 							DAO.getInstance().commit();
 						} catch (HibernateException ex)
 						{
