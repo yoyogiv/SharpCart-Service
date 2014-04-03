@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.print.attribute.HashAttributeSet;
@@ -25,7 +26,7 @@ public class SharpCartUser {
 	
 	private Set<Store> stores;
 	
-	private String zip;
+	private UsZipCode zip;
 	
 	private String familySize;
 	
@@ -93,13 +94,15 @@ public class SharpCartUser {
 	/**
 	 * @return the zip
 	 */
-	public String getZip() {
+	@ManyToOne
+	@JoinColumn(name="zipCode")
+	public UsZipCode getZip() {
 		return zip;
 	}
 	/**
 	 * @param zip the zip to set
 	 */
-	public void setZip(String zip) {
+	public void setZip(UsZipCode zip) {
 		this.zip = zip;
 	}
 	/**

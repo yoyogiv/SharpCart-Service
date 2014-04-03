@@ -21,6 +21,7 @@ import com.sharpcart.rest.dao.DAO;
 import com.sharpcart.rest.persistence.model.SharpCartUser;
 import com.sharpcart.rest.persistence.model.ShoppingItem;
 import com.sharpcart.rest.persistence.model.Store;
+import com.sharpcart.rest.persistence.model.UsZipCode;
 import com.sharpcart.rest.persistence.model.UserExtraShoppingItem;
 import com.sharpcart.rest.persistence.model.UserShoppingItem;
 
@@ -83,11 +84,23 @@ public class UsersUnitTest {
 	  
 	  user.setUserName("testUser@gmail.com");
 	  user.setPassword("123456");
-	  user.setZip("78681");
 	  user.setFamilySize("3");
 	  user.addStores(stores);
 	  user.setUserInformationLastUpdate(new Date());
 	  
+	  //setup zip code
+  	  try {
+	  		DAO.getInstance().begin();
+	  		query = DAO.getInstance().getSession().createQuery("from UsZIPCode where zip = :userZipCode");
+	  		query.setInteger("userZipCode", 78681);
+	  		UsZipCode userZIPCode = (UsZipCode) query.uniqueResult();
+	  		user.setZip(userZIPCode);
+	  	  } catch (HibernateException ex)
+	  	  {
+	  		  DAO.getInstance().rollback();
+	  		  ex.printStackTrace();
+	  	  }
+  	  
 	  assertEquals(5,user.getStores().size());
 	  
 	  //create some regular user shopping items

@@ -33,6 +33,7 @@ import com.sharpcart.rest.persistence.model.SharpCartUser;
 import com.sharpcart.rest.persistence.model.ShoppingItem;
 import com.sharpcart.rest.persistence.model.Store;
 import com.sharpcart.rest.persistence.model.StoreItem;
+import com.sharpcart.rest.persistence.model.UsZipCode;
 import com.sharpcart.rest.persistence.model.UserExtraShoppingItem;
 import com.sharpcart.rest.persistence.model.UserShoppingItem;
 import com.sharpcart.rest.utilities.PasswordHash;
@@ -108,7 +109,20 @@ public class UserManagementController {
 	  	  final SharpCartUser persistanceUser = new SharpCartUser();
 	  	  persistanceUser.setUserName(jsonUser.getUserName());
 	  	  persistanceUser.setPassword(jsonUser.getPassword());
-	  	  persistanceUser.setZip(jsonUser.getZip());
+	  	  
+	  	  //create a zip object for the user
+	  	  try {
+	  		DAO.getInstance().begin();
+	  		query = DAO.getInstance().getSession().createQuery("from UsZIPCode where zip = :userZipCode");
+	  		query.setInteger("userZipCode", Integer.valueOf(jsonUser.getZip()));
+	  		UsZipCode userZIPCode = (UsZipCode) query.uniqueResult();
+	  		persistanceUser.setZip(userZIPCode);
+	  	  } catch (HibernateException ex)
+	  	  {
+	  		  DAO.getInstance().rollback();
+	  		  ex.printStackTrace();
+	  	  }
+	  	  
 	  	  persistanceUser.setFamilySize(jsonUser.getFamilySize());
 	  	  
 	  	  //Convert the JSON stores string to a set of store objects
@@ -278,8 +292,19 @@ public class UserManagementController {
 							   * In order to be able to save the JSON user in the database we need to convert it
 							   * to our persistence user model
 							   */
-	
-								user.setZip(jsonUser.getZip());
+								
+						  	  try {
+							  		DAO.getInstance().begin();
+							  		query = DAO.getInstance().getSession().createQuery("from UsZIPCode where zip = :userZipCode");
+							  		query.setInteger("userZipCode", Integer.valueOf(jsonUser.getZip()));
+							  		UsZipCode userZIPCode = (UsZipCode) query.uniqueResult();
+							  		user.setZip(userZIPCode);
+							  	  } catch (HibernateException ex)
+							  	  {
+							  		  DAO.getInstance().rollback();
+							  		  ex.printStackTrace();
+							  	  }
+						  	  
 								user.setFamilySize(jsonUser.getFamilySize());
 							  
 								//Convert the JSON stores string to a set of store objects
@@ -320,7 +345,7 @@ public class UserManagementController {
 							{
 								updatedJsonUser.setUserName(user.getUserName());
 								updatedJsonUser.setPassword("");
-								updatedJsonUser.setZip(user.getZip());
+								updatedJsonUser.setZip(String.valueOf(user.getZip().getZip()));
 								updatedJsonUser.setFamilySize(user.getFamilySize());
 								
 								String userStoresIdString = "";
