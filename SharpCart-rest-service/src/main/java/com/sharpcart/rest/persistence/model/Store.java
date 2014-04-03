@@ -3,12 +3,16 @@ package com.sharpcart.rest.persistence.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -30,9 +34,14 @@ public class Store {
 	
 	private String zip;
 	
+	private Set<UsZipCode> servicingZipCodes;
+	
 	private String imageLocation;
 	
+	private String onSaleFlyerURL;
+
 	private Set<SharpCartUser> sharpCartUsers;
+	
 
 	/**
 	 * @param name
@@ -144,6 +153,24 @@ public class Store {
 	public void setZip(String zip) {
 		this.zip = zip;
 	}
+	
+	/**
+	 * @return the servicingZipCodes
+	 */
+	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true)
+    @JoinTable(name = "StoreServicingZipCode", joinColumns = {
+            @JoinColumn(name = "storeId")}, inverseJoinColumns = {
+            @JoinColumn(name = "zipCode")})
+	public Set<UsZipCode> getServicingZipCodes() {
+		return servicingZipCodes;
+	}
+
+	/**
+	 * @param servicingZipCodes the servicingZipCodes to set
+	 */
+	public void setServicingZipCodes(Set<UsZipCode> servicingZipCodes) {
+		this.servicingZipCodes = servicingZipCodes;
+	}
 
 	/**
 	 * @return the imageLocation
@@ -157,6 +184,20 @@ public class Store {
 	 */
 	public void setImageLocation(String imageLocation) {
 		this.imageLocation = imageLocation;
+	}
+	
+	/**
+	 * @return the onSaleFlyerURL
+	 */
+	public String getOnSaleFlyerURL() {
+		return onSaleFlyerURL;
+	}
+
+	/**
+	 * @param onSaleFlyerURL the onSaleFlyerURL to set
+	 */
+	public void setOnSaleFlyerURL(String onSaleFlyerURL) {
+		this.onSaleFlyerURL = onSaleFlyerURL;
 	}
 
 	/**
