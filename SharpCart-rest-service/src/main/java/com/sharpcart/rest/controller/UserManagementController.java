@@ -44,7 +44,7 @@ public class UserManagementController {
     private static Logger LOG = LoggerFactory.getLogger(UserManagementController.class);
 	
     private Query query;
-	final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public UserManagementController()
 	{
@@ -467,8 +467,9 @@ public class UserManagementController {
 		    			
 		    			syncedSharpList.setMainSharpList(sharpList.getMainSharpList());
 		    			
-						user.setActiveShoppingListLastUpdate(new Date());
-						syncedSharpList.setLastUpdated(df.format(new Date()));
+		    			//copy time stamp from device to database
+						user.setActiveShoppingListLastUpdate(df.parse(sharpList.getLastUpdated()));
+						syncedSharpList.setLastUpdated(sharpList.getLastUpdated());
 		    		
 						//Save user to database
 						try {
@@ -501,7 +502,7 @@ public class UserManagementController {
 							shoppingListItem.setUnit(userShoppingItem.getShoppingItem().getUnit().getName()); //unit name
 							shoppingListItem.setShopping_item_category_id(userShoppingItem.getShoppingItem().getCategory().getId()); //category id
 							shoppingListItem.setCategory(userShoppingItem.getShoppingItem().getCategory().getName()); //category name
-							shoppingListItem.setConversion_ratio(userShoppingItem.getShoppingItem().getId()); //conversion ratio
+							shoppingListItem.setConversion_ratio(userShoppingItem.getShoppingItem().getUnitToItemConversionRatio()); //conversion ratio
 							shoppingListItem.setImage_location(userShoppingItem.getShoppingItem().getImageLocation()); //image location
 							
 							//add item to temp list
@@ -527,8 +528,10 @@ public class UserManagementController {
 							tempShoppingListItemList.add(extraShoppingListItem);
 						}
 						
-		    			//add items from database to returned json and set time stamp
+		    			//add items from database to returned json
 		    			syncedSharpList.setMainSharpList(tempShoppingListItemList);
+		    			
+		    			//copy time stamp from database to device
 		    			syncedSharpList.setLastUpdated(df.format(user.getActiveShoppingListLastUpdate()));
 					}
 				} catch (ParseException e) {

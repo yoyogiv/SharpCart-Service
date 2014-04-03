@@ -301,13 +301,14 @@ public class UsersUnitTest {
   @Test
   public void removeUserFromDatabase() {
 	  Query query;
+	  SharpCartUser user=null;
 	  
 	  //Get user from Database
 	  try {
 		  DAO.getInstance().begin();
 		  query = DAO.getInstance().getSession().createQuery("from SharpCartUser where userName = :userName");
 		  query.setString("userName", "testUser@gmail.com");
-		  SharpCartUser user = (SharpCartUser)query.uniqueResult();
+		  user = (SharpCartUser)query.uniqueResult();
 		  DAO.getInstance().commit();
 	  } catch (HibernateException ex)
 	  {
@@ -321,6 +322,9 @@ public class UsersUnitTest {
 		  DAO.getInstance().begin();
 		  DAO.getInstance().getSession().delete(user);
 		  DAO.getInstance().commit();
+		  DAO.getInstance().close();
+		  
+		  user=null;
 	  }
 	  
 	  //Check the user has been deleted
