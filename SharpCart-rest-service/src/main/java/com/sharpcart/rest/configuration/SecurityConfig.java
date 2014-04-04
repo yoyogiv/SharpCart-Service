@@ -33,7 +33,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     http
     	.csrf().disable()
     	.authorizeRequests()
-    	.antMatchers("/aggregators/user/register","/aggregators/user/login","/aggregators/groceryItems/unavailable").permitAll()
+    	.antMatchers("/aggregators/user/register",
+    				"/aggregators/user/login",
+    				"/aggregators/groceryItems/unavailable",
+    				"/aggregators/store/servingZIPCode").permitAll()
         .antMatchers("/aggregators/optimize","/aggregators/user/update","/aggregators/user/syncSharpList").permitAll()
         .anyRequest().authenticated()
         //.and()

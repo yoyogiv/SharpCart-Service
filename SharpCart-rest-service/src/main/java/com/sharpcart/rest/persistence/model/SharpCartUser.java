@@ -69,6 +69,9 @@ public class SharpCartUser {
 	 * @return the stores
 	 */
 	@ManyToMany
+    @JoinTable(	name = "UserStore", 
+			joinColumns = {@JoinColumn(name = "userId")}, 
+			inverseJoinColumns = {@JoinColumn(name = "storeId")})
 	public Set<Store> getStores() {
 		return stores;
 	}

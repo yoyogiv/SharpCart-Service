@@ -1,11 +1,14 @@
 package com.sharpcart.rest.persistence.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,14 +37,11 @@ public class Store {
 	
 	private String zip;
 	
-	private Set<UsZipCode> servicingZipCodes;
+	private List<UsZipCode> servicingZipCodes;
 	
 	private String imageLocation;
 	
 	private String onSaleFlyerURL;
-
-	private Set<SharpCartUser> sharpCartUsers;
-	
 
 	/**
 	 * @param name
@@ -59,7 +59,7 @@ public class Store {
 		this.state = state;
 		this.zip = zip;
 		this.imageLocation = imageLocation;
-		this.sharpCartUsers = new HashSet<SharpCartUser>();
+		this.servicingZipCodes = new ArrayList<UsZipCode>();
 	}
 	
 	public Store()
@@ -157,18 +157,18 @@ public class Store {
 	/**
 	 * @return the servicingZipCodes
 	 */
-	@OneToMany(cascade = {CascadeType.ALL},orphanRemoval=true)
-    @JoinTable(name = "StoreServicingZipCode", joinColumns = {
-            @JoinColumn(name = "storeId")}, inverseJoinColumns = {
-            @JoinColumn(name = "zipCode")})
-	public Set<UsZipCode> getServicingZipCodes() {
+	@ManyToMany(cascade = {CascadeType.ALL},fetch=FetchType.EAGER)
+    @JoinTable(	name = "StoreServicingZipCode", 
+    			joinColumns = {@JoinColumn(name = "storeId")}, 
+    			inverseJoinColumns = {@JoinColumn(name = "zipCode")})
+	public List<UsZipCode> getServicingZipCodes() {
 		return servicingZipCodes;
 	}
 
 	/**
 	 * @param servicingZipCodes the servicingZipCodes to set
 	 */
-	public void setServicingZipCodes(Set<UsZipCode> servicingZipCodes) {
+	public void setServicingZipCodes(List<UsZipCode> servicingZipCodes) {
 		this.servicingZipCodes = servicingZipCodes;
 	}
 
@@ -200,19 +200,4 @@ public class Store {
 		this.onSaleFlyerURL = onSaleFlyerURL;
 	}
 
-	/**
-	 * @return the sharpCartUsers
-	 */
-	@ManyToMany(mappedBy = "stores")
-	public Set<SharpCartUser> getSharpCartUsers() {
-		return sharpCartUsers;
-	}
-
-	/**
-	 * @param sharpCartUsers the sharpCartUsers to set
-	 */
-	public void setSharpCartUsers(Set<SharpCartUser> sharpCartUsers) {
-		this.sharpCartUsers = sharpCartUsers;
-	}
-	
 }
