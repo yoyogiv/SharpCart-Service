@@ -77,32 +77,30 @@ public class OptimizeSharpListController {
 	    		
 	    		for (final ShoppingListItem item : sharpList.getMainSharpList())
 	    		{
-	    			//debug
-	    	    	LOG.debug("Main sharp list item id: "+item.getId());
-	    	    	
-	    			StoreItem storeItem = new StoreItem();
-	    	    	try {
-		    	  	  	DAO.getInstance().begin();
-		    		  	query = DAO.getInstance().getSession().createQuery("from StoreItem where storeId = :storeId and shoppingItemId = :shoppingItemId");
-		    		  	query.setLong("storeId", store.getId());
-		    		  	query.setLong("shoppingItemId",item.getId());
-		    		  	storeItem = (StoreItem)query.uniqueResult();
-		    		  	DAO.getInstance().commit();
-	    	    	} catch (final HibernateException ex)
-	    	    	{
-	    	    		DAO.getInstance().rollback();
-	    	    		ex.printStackTrace();
-	    	    	}
-	    	    	
-	    	    	//debug
-	    	    	if (storeItem!=null)
-	    	    		LOG.debug("Store item id: "+storeItem.getId());
-
-	    	    	
-	    	    	if (storeItem!=null)
-	    	    	{
+	    			if (!item.getCategory().equalsIgnoreCase("extra")) //check that the item is not one of the extra items
+	    			{
+		    			//debug
+		    	    	LOG.debug("Main sharp list item id: "+item.getId());
+		    	    	
+		    			StoreItem storeItem = new StoreItem();
+		    	    	try {
+			    	  	  	DAO.getInstance().begin();
+			    		  	query = DAO.getInstance().getSession().createQuery("from StoreItem where storeId = :storeId and shoppingItemId = :shoppingItemId");
+			    		  	query.setLong("storeId", store.getId());
+			    		  	query.setLong("shoppingItemId",item.getId());
+			    		  	storeItem = (StoreItem)query.uniqueResult();
+			    		  	DAO.getInstance().commit();
+		    	    	} catch (final HibernateException ex)
+		    	    	{
+		    	    		DAO.getInstance().rollback();
+		    	    		ex.printStackTrace();
+		    	    	}
+		    	    	
+		    	    	//debug
+		    	    	if (storeItem!=null)
+		    	    		LOG.debug("Store item id: "+storeItem.getId());
+	
 		    	    	//Now that we have the store item we can generate our ShoppingListItem from it
-		    	    	final ShoppingListItem shoppingListItem = new ShoppingListItem();
 		    	    	/*
 		    	    	 * Id
 		    	    	 * Name
@@ -121,65 +119,91 @@ public class OptimizeSharpListController {
 		    	    	 * Total price
 		    	    	 * 
 		    	    	 */
-		    	    	shoppingListItem.setId(storeItem.getShoppingItem().getId());
-		    	    	shoppingListItem.setName(storeItem.getShoppingItem().getName());
-		    	    	shoppingListItem.setDescription(storeItem.getShoppingItem().getDescription());
-		    	    	shoppingListItem.setUnit(storeItem.getShoppingItem().getUnit().getName());
-		    	    	shoppingListItem.setShopping_item_unit_id(storeItem.getShoppingItem().getUnit().getId());
-		    	    	shoppingListItem.setCategory(storeItem.getShoppingItem().getCategory().getName());
-		    	    	shoppingListItem.setShopping_item_category_id(storeItem.getShoppingItem().getCategory().getId());
-		    	    	shoppingListItem.setConversion_ratio(storeItem.getShoppingItem().getUnitToItemConversionRatio());
-		    	    	shoppingListItem.setImage_location(storeItem.getShoppingItem().getImageLocation());
+		    	    	final ShoppingListItem shoppingListItem = new ShoppingListItem();
 		    	    	
-		    	    	//user list specific quantities
-		    	    	shoppingListItem.setQuantity(item.getQuantity());
-		    	    	
-		    	    	//price related information
-		    	    	shoppingListItem.setPrice(storeItem.getPrice());
-		    	    	shoppingListItem.setPackage_quantity(storeItem.getQuantity());
-		    	    	if (storeItem.getPrice()>0)
-		    	    		shoppingListItem.setPrice_per_unit(storeItem.getPrice()/storeItem.getQuantity());
-		    	    	
-		    	    	//get prices for items on sale
-		    	    	
-		    	    	//calculate total cost
-		    	    	if ((storeItem.getPrice()!=0)&&(storeItem.getQuantity()!=0))
+		    	    	if (storeItem!=null)
 		    	    	{
-		    	    		if (item.getQuantity()<=storeItem.getQuantity())
-		    	    		{
-		    	    			shoppingListItem.setTotal_price(storeItem.getPrice());
-		    	    			shoppingListItem.setQuantity(storeItem.getQuantity());
-		    	    		} else
-		    	    		{
-		    	    			shoppingListItem.setTotal_price((item.getQuantity()/storeItem.getQuantity())*storeItem.getPrice());
-		    	    			
-		    	    			/* if user quantity has a reminder when dividing by item package quantity, we add one more package
-		    	    			 * since you cant buy a fraction of a package
-		    	    			 */
-		    	    			 if ((item.getQuantity()%storeItem.getQuantity())!=0)
-		    	    			 {
-		    	    				 shoppingListItem.setTotal_price(shoppingListItem.getTotal_price()+storeItem.getPrice());
-		    	    				 shoppingListItem.setQuantity(Math.floor(((item.getQuantity()/storeItem.getQuantity())+1)*storeItem.getQuantity()));
-		    	    			 }
-		    	    		}
-		    	    	}
 
+			    	    	shoppingListItem.setId(storeItem.getShoppingItem().getId());
+			    	    	shoppingListItem.setName(storeItem.getShoppingItem().getName());
+			    	    	shoppingListItem.setDescription(storeItem.getShoppingItem().getDescription());
+			    	    	shoppingListItem.setUnit(storeItem.getShoppingItem().getUnit().getName());
+			    	    	shoppingListItem.setShopping_item_unit_id(storeItem.getShoppingItem().getUnit().getId());
+			    	    	shoppingListItem.setCategory(storeItem.getShoppingItem().getCategory().getName());
+			    	    	shoppingListItem.setShopping_item_category_id(storeItem.getShoppingItem().getCategory().getId());
+			    	    	shoppingListItem.setConversion_ratio(storeItem.getShoppingItem().getUnitToItemConversionRatio());
+			    	    	shoppingListItem.setImage_location(storeItem.getShoppingItem().getImageLocation());
+			    	    	
+			    	    	//user list specific quantities
+			    	    	shoppingListItem.setQuantity(item.getQuantity());
+			    	    	
+			    	    	//price related information
+			    	    	shoppingListItem.setPrice(storeItem.getPrice());
+			    	    	shoppingListItem.setPackage_quantity(storeItem.getQuantity());
+			    	    	if (storeItem.getPrice()>0)
+			    	    		shoppingListItem.setPrice_per_unit(storeItem.getPrice()/storeItem.getQuantity());
+			    	    	
+			    	    	//get prices for items on sale
+			    	    	
+			    	    	//calculate total cost
+			    	    	if ((storeItem.getPrice()!=0)&&(storeItem.getQuantity()!=0))
+			    	    	{
+			    	    		if (item.getQuantity()<=storeItem.getQuantity())
+			    	    		{
+			    	    			shoppingListItem.setTotal_price(storeItem.getPrice());
+			    	    			shoppingListItem.setQuantity(storeItem.getQuantity());
+			    	    		} else
+			    	    		{
+			    	    			shoppingListItem.setTotal_price((item.getQuantity()/storeItem.getQuantity())*storeItem.getPrice());
+			    	    			
+			    	    			/* if user quantity has a reminder when dividing by item package quantity, we add one more package
+			    	    			 * since you cant buy a fraction of a package
+			    	    			 */
+			    	    			 if ((item.getQuantity()%storeItem.getQuantity())!=0)
+			    	    			 {
+			    	    				 shoppingListItem.setTotal_price(shoppingListItem.getTotal_price()+storeItem.getPrice());
+			    	    				 shoppingListItem.setQuantity(Math.floor(((item.getQuantity()/storeItem.getQuantity())+1)*storeItem.getQuantity()));
+			    	    			 }
+			    	    		}
+			    	    	}
+			    	    	
+		    	    	} else //this particular store doesnt carry this item, so we create a demi item with a price set to 0
+		    	    	{
+			    	    	shoppingListItem.setId(item.getId());
+			    	    	shoppingListItem.setName(item.getName());
+			    	    	shoppingListItem.setDescription(item.getDescription());
+			    	    	shoppingListItem.setUnit(item.getUnit());
+			    	    	shoppingListItem.setShopping_item_unit_id(item.getShopping_item_unit_id());
+			    	    	shoppingListItem.setCategory(item.getCategory());
+			    	    	shoppingListItem.setShopping_item_category_id(item.getShopping_item_category_id());
+			    	    	shoppingListItem.setConversion_ratio(-1);
+			    	    	shoppingListItem.setImage_location(item.getImage_location());
+			    	    	
+			    	    	//user list specific quantities
+			    	    	shoppingListItem.setQuantity(item.getQuantity());
+			    	    	
+			    	    	//price related information
+			    	    	shoppingListItem.setPrice(0);
+			    	    	shoppingListItem.setPackage_quantity(1);
+			    	    	shoppingListItem.setTotal_price(0);
+			    	    	shoppingListItem.setPrice_per_unit(0);  	    	
+		    	    	}
+		    	    	
 		    	    	//add item to store prices grocery items list
 		    	    	groceryItems.add(shoppingListItem);
 		    	    	
-	    	    	}
-	    	    	
-	    	    	//add list of grocery items to store prices object
-	    	    	storePrices.setItems(groceryItems);
-	    	    	
-	    	    	//calculate total cost
-	    	    	float totalCost = 0;
-	    	    	for (final ShoppingListItem groceryItem : groceryItems)
-	    	    	{
-	    	    		totalCost+=groceryItem.getTotal_price();
-	    	    	}
-	    	    	
-	    	    	storePrices.setTotal_cost(totalCost);
+		    	    	//add list of grocery items to store prices object
+		    	    	storePrices.setItems(groceryItems);
+		    	    	
+		    	    	//calculate total cost
+		    	    	float totalCost = 0;
+		    	    	for (final ShoppingListItem groceryItem : groceryItems)
+		    	    	{
+		    	    		totalCost+=groceryItem.getTotal_price();
+		    	    	}
+		    	    	
+		    	    	storePrices.setTotal_cost(totalCost);
+	    			}
 	    		}
 	    		
 	    		//add to optimized list
