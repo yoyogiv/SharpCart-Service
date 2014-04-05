@@ -113,9 +113,11 @@ public class UserManagementController {
 	  	  //create a zip object for the user
 	  	  try {
 	  		DAO.getInstance().begin();
-	  		query = DAO.getInstance().getSession().createQuery("from UsZIPCode where zip = :userZipCode");
+	  		query = DAO.getInstance().getSession().createQuery("from UsZipCode where zip = :userZipCode");
 	  		query.setInteger("userZipCode", Integer.valueOf(jsonUser.getZip()));
 	  		UsZipCode userZIPCode = (UsZipCode) query.uniqueResult();
+	  		DAO.getInstance().commit();
+	  		
 	  		persistanceUser.setZip(userZIPCode);
 	  	  } catch (HibernateException ex)
 	  	  {
@@ -295,9 +297,11 @@ public class UserManagementController {
 								
 						  	  try {
 							  		DAO.getInstance().begin();
-							  		query = DAO.getInstance().getSession().createQuery("from UsZIPCode where zip = :userZipCode");
+							  		query = DAO.getInstance().getSession().createQuery("from UsZipCode where zip = :userZipCode");
 							  		query.setInteger("userZipCode", Integer.valueOf(jsonUser.getZip()));
 							  		UsZipCode userZIPCode = (UsZipCode) query.uniqueResult();
+							  		DAO.getInstance().commit();
+							  		
 							  		user.setZip(userZIPCode);
 							  	  } catch (HibernateException ex)
 							  	  {
@@ -311,32 +315,48 @@ public class UserManagementController {
 								final String stores[] = jsonUser.getStores().split("-");
 							  
 								//grab stores from database
-								DAO.getInstance().begin();
-								query = DAO.getInstance().getSession().createQuery("from Store");
-								final List<Store> storeList = query.list();	
-								DAO.getInstance().commit();
-							  
-								final HashSet<Store> userStores = new HashSet<Store>();
-							  
-								for (final String storeId : stores)
+								List<Store> storeList = null;
+								try {
+									DAO.getInstance().begin();
+									query = DAO.getInstance().getSession().createQuery("from Store");
+									storeList = query.list();	
+									DAO.getInstance().commit();
+								} catch (HibernateException ex)
 								{
-									for (final Store store : storeList)
+									DAO.getInstance().rollback();
+									ex.printStackTrace();
+								}
+								
+								final HashSet<Store> userStores = new HashSet<Store>();
+								
+								if (storeList!=null)
+								{
+									for (final String storeId : stores)
 									{
-									  if (store.getId()==Long.valueOf(storeId))
-									  {
-										  userStores.add(store);
-									  }
+										for (final Store store : storeList)
+										{
+										  if (store.getId()==Long.valueOf(storeId))
+										  {
+											  userStores.add(store);
+										  }
+										}
 									}
 								}
-							  
+								
 								user.addStores(userStores);
-							  
+								
 								user.setUserInformationLastUpdate(new Date());
 								
 								//save user into database
-								DAO.getInstance().begin();
-								DAO.getInstance().getSession().update(user);
-								DAO.getInstance().commit();
+								try {
+									DAO.getInstance().begin();
+									DAO.getInstance().getSession().update(user);
+									DAO.getInstance().commit();
+								} catch (HibernateException ex)
+								{
+									DAO.getInstance().rollback();
+									ex.printStackTrace();
+								}
 								
 								//since the device profile is newer we return it back to the device
 								updatedJsonUser = jsonUser;
@@ -431,7 +451,7 @@ public class UserManagementController {
     	{	
     		//check if database user sharplist is newer or older than device version
     		try {
-				if (user.getActiveShoppingListLastUpdate().before(df.parse(sharpList.getLastUpdated())))	
+				if ((user.getActiveShoppingListLastUpdate()==null)||(user.getActiveShoppingListLastUpdate().before(df.parse(sharpList.getLastUpdated()))))	
 					{
 						LOG.info("Database user sharp list is older than device, updating database");
 					
