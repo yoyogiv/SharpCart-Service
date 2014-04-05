@@ -91,9 +91,11 @@ public class UsersUnitTest {
 	  //setup zip code
   	  try {
 	  		DAO.getInstance().begin();
-	  		query = DAO.getInstance().getSession().createQuery("from UsZIPCode where zip = :userZipCode");
+	  		query = DAO.getInstance().getSession().createQuery("from UsZipCode where zip = :userZipCode");
 	  		query.setInteger("userZipCode", 78681);
 	  		UsZipCode userZIPCode = (UsZipCode) query.uniqueResult();
+	  		DAO.getInstance().commit();
+	  		
 	  		user.setZip(userZIPCode);
 	  	  } catch (HibernateException ex)
 	  	  {
@@ -102,6 +104,8 @@ public class UsersUnitTest {
 	  	  }
   	  
 	  assertEquals(5,user.getStores().size());
+	  
+	  assertEquals(78681, user.getZip().getZip());
 	  
 	  //create some regular user shopping items
 	  UserShoppingItem item1 = new UserShoppingItem();

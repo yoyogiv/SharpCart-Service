@@ -33,7 +33,7 @@ public class StoreManagementController {
 	}
 	
 	/*
-	 * Retrieve avilable stores for a specific ZIP code 
+	 * Retrieve available stores for a specific ZIP code 
 	 */
     @RequestMapping(value="/aggregators/store/servingZIPCode",method = RequestMethod.GET)
     @ResponseBody
