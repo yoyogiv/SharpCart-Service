@@ -45,6 +45,7 @@ dependencies {
 	compile 'org.springframework:spring-context:4.0.2.RELEASE'
 	compile 'org.springframework:spring-core:4.0.2.RELEASE'
     compile 'org.springframework:spring-webmvc:4.0.2.RELEASE'
+    compile 'org.springframework:spring-jdbc:4.0.3.RELEASE'
     
 	//spring 3.2
     //compile 'org.springframework:spring-core:3.2.3.RELEASE'
