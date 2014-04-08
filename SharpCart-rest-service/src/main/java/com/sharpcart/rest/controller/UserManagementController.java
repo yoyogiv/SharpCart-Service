@@ -451,9 +451,12 @@ public class UserManagementController {
     	{	
     		//check if database user sharplist is newer or older than device version
     		try {
-				if ((user.getActiveShoppingListLastUpdate()==null)||(user.getActiveShoppingListLastUpdate().before(df.parse(sharpList.getLastUpdated()))))	
+				if ((user.getActiveShoppingListLastUpdate()==null)||
+						(user.getActiveShoppingListLastUpdate().getTime()<(df.parse(sharpList.getLastUpdated()).getTime())))	
 					{
-						LOG.info("Database user sharp list is older than device, updating database");
+						LOG.info("Database user sharp list is older than device, updating database."+
+								"Database: "+user.getActiveShoppingListLastUpdate().getTime()+
+								" Device: "+df.parse(sharpList.getLastUpdated()).getTime());
 					
 		    			//if it is older, update database with device version and delete any older information				  	
 		    			for (ShoppingListItem item : sharpList.getMainSharpList())
@@ -513,6 +516,8 @@ public class UserManagementController {
 		    			syncedSharpList.setMainSharpList(sharpList.getMainSharpList());
 		    			
 		    			//copy time stamp from device to database
+		    			LOG.info("Copying time stamp from device to database: "+sharpList.getLastUpdated());
+		    			
 						user.setActiveShoppingListLastUpdate(df.parse(sharpList.getLastUpdated()));
 						syncedSharpList.setLastUpdated(sharpList.getLastUpdated());
 		    		
@@ -526,9 +531,11 @@ public class UserManagementController {
 							DAO.getInstance().rollback();
 							ex.printStackTrace();
 						}		
-					} else //database user sharp list is newer than device
+					} else if (user.getActiveShoppingListLastUpdate().getTime()>df.parse(sharpList.getLastUpdated()).getTime()) //database user sharp list is newer than device
 					{
-						LOG.info("Database user sharp list is newer than device, updating device");
+						LOG.info("Database user sharp list is newer than device, updating device."+
+								"Database: "+user.getActiveShoppingListLastUpdate().getTime()+
+								" Device: "+df.parse(sharpList.getLastUpdated()).getTime());
 						
 						//iterate over database items and generate a list<ShoppingListItem>
 						List<ShoppingListItem> tempShoppingListItemList = new ArrayList<ShoppingListItem>();
@@ -577,6 +584,8 @@ public class UserManagementController {
 		    			syncedSharpList.setMainSharpList(tempShoppingListItemList);
 		    			
 		    			//copy time stamp from database to device
+		    			LOG.info("Copying time stamp from database to device: "+df.format(user.getActiveShoppingListLastUpdate()));
+		    			
 		    			syncedSharpList.setLastUpdated(df.format(user.getActiveShoppingListLastUpdate()));
 					}
 				} catch (ParseException e) {
