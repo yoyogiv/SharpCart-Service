@@ -127,11 +127,13 @@ public class UserManagementController {
 	  	  
 	  	  persistanceUser.setFamilySize(jsonUser.getFamilySize());
 	  	  
+	  	  
 	  	  //Convert the JSON stores string to a set of store objects
-	  	  final String stores[] = jsonUser.getStores().split("-");
+	  	  //final String stores[] = jsonUser.getStores().split("-");
 	  	  
 	  	  //grab stores from database
 	  	  try {
+	  		  /*
 		  	  DAO.getInstance().begin();
 		  	  query = DAO.getInstance().getSession().createQuery("from Store");
 		  	  final List<Store> storeList = query.list();	
@@ -151,7 +153,10 @@ public class UserManagementController {
 		  	  }
 		  	  
 		  	  persistanceUser.addStores(userStores);
-		  	  
+		  	  */
+	  	  	  
+	  	  	  persistanceUser.addStores(jsonUser.getStores());
+	  	  	  
 		  	  if (!jsonUser.getLastUpdated().equals(new Date(0)))
 		  	  {
 				persistanceUser.setUserInformationLastUpdate(df.parse(jsonUser.getLastUpdated()));
@@ -310,7 +315,8 @@ public class UserManagementController {
 							  	  }
 						  	  
 								user.setFamilySize(jsonUser.getFamilySize());
-							  
+								
+								/*
 								//Convert the JSON stores string to a set of store objects
 								final String stores[] = jsonUser.getStores().split("-");
 							  
@@ -344,7 +350,9 @@ public class UserManagementController {
 								}
 								
 								user.addStores(userStores);
+								*/
 								
+								user.addStores(jsonUser.getStores());
 								user.setUserInformationLastUpdate(new Date());
 								
 								//save user into database
@@ -368,6 +376,7 @@ public class UserManagementController {
 								updatedJsonUser.setZip(String.valueOf(user.getZip().getZip()));
 								updatedJsonUser.setFamilySize(user.getFamilySize());
 								
+								/*
 								String userStoresIdString = "";
 								
 								for (final Store store : user.getStores())
@@ -379,6 +388,9 @@ public class UserManagementController {
 								userStoresIdString = userStoresIdString.substring(0, userStoresIdString.lastIndexOf("-"));
 								
 								updatedJsonUser.setStores(userStoresIdString);
+								*/
+								
+								updatedJsonUser.setStores(user.getStores());
 								
 								updatedJsonUser.setLastUpdated(df.format(user.getUserInformationLastUpdate()));
 								

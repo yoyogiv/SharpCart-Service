@@ -1,10 +1,12 @@
 package com.sharpcart.rest.model;
 
-import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
+import com.sharpcart.rest.persistence.model.Store;
+
 public class UserProfile {
-	private String stores;
+	private Set<Store> stores;
 	private String zip;
 	private String familySize;
 	private String userName;
@@ -12,23 +14,20 @@ public class UserProfile {
 	private String lastUpdated;
 	
 	public UserProfile() {
-		zip = "";
-		familySize = "";
-		userName = "";
-		stores = "";
+
 	}
 
 	/**
 	 * @return the stores
 	 */
-	public String getStores() {
+	public Set<Store> getStores() {
 		return stores;
 	}
 
 	/**
 	 * @param stores the stores to set
 	 */
-	public void setStores(final String stores) {
+	public void setStores(final Set<Store> stores) {
 		this.stores = stores;
 	}
 
@@ -223,8 +222,7 @@ public class UserProfile {
 	/**
 	 * @param lastUpdated the lastUpdated to set
 	 */
-	public void setLastUpdated(String lastUpdated) {
+	public void setLastUpdated(final String lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
-	
 }
