@@ -352,6 +352,7 @@ public class UserManagementController {
 								user.addStores(userStores);
 								*/
 								
+								user.getStores().clear();
 								user.addStores(jsonUser.getStores());
 								user.setUserInformationLastUpdate(new Date());
 								

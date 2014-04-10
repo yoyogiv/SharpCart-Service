@@ -45,11 +45,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
     	.csrf().disable()
+    	//.authorizeRequests()
     	.authorizeRequests()
     	.antMatchers("/aggregators/user/register",
     				"/aggregators/user/login",
-    				"/aggregators/groceryItems/unavailable").permitAll()
-        .antMatchers("/aggregators/optimize","/aggregators/user/update","/aggregators/user/syncSharpList","/aggregators/store/servingZIPCode").authenticated()
+    				"/aggregators/groceryItems/unavailable",
+    				"/aggregators/store/servingZIPCode").permitAll()
+        .antMatchers("/aggregators/optimize",
+        			"/aggregators/user/update",
+        			"/aggregators/user/syncSharpList").authenticated()
         .anyRequest().authenticated()
         .and()
         .httpBasic().realmName("SharpCart Security")
