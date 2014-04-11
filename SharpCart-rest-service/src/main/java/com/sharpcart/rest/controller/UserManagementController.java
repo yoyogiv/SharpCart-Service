@@ -258,12 +258,12 @@ public class UserManagementController {
     	UserProfile updatedJsonUser = new UserProfile();
     	
     	//debug	
-    	LOG.debug("User Name: "+jsonUser.getUserName()); //name
+    	LOG.info("User Name: "+jsonUser.getUserName()); //name
     	LOG.debug("User Password: "+jsonUser.getPassword()); //password
     	LOG.debug("User Zip: "+jsonUser.getZip()); //zip
     	LOG.debug("User Family Size: "+jsonUser.getFamilySize()); //family size
     	LOG.debug("User Stores: "+jsonUser.getStores()); //stores
-    	LOG.debug("Last Updated: "+jsonUser.getLastUpdated()); //last updated
+    	LOG.info("Last Updated: "+jsonUser.getLastUpdated()); //last updated
     	 
     	
     	//check if user already exits in the system
@@ -316,42 +316,6 @@ public class UserManagementController {
 						  	  
 								user.setFamilySize(jsonUser.getFamilySize());
 								
-								/*
-								//Convert the JSON stores string to a set of store objects
-								final String stores[] = jsonUser.getStores().split("-");
-							  
-								//grab stores from database
-								List<Store> storeList = null;
-								try {
-									DAO.getInstance().begin();
-									query = DAO.getInstance().getSession().createQuery("from Store");
-									storeList = query.list();	
-									DAO.getInstance().commit();
-								} catch (HibernateException ex)
-								{
-									DAO.getInstance().rollback();
-									ex.printStackTrace();
-								}
-								
-								final HashSet<Store> userStores = new HashSet<Store>();
-								
-								if (storeList!=null)
-								{
-									for (final String storeId : stores)
-									{
-										for (final Store store : storeList)
-										{
-										  if (store.getId()==Long.valueOf(storeId))
-										  {
-											  userStores.add(store);
-										  }
-										}
-									}
-								}
-								
-								user.addStores(userStores);
-								*/
-								
 								user.getStores().clear();
 								user.addStores(jsonUser.getStores());
 								user.setUserInformationLastUpdate(new Date());
@@ -372,36 +336,24 @@ public class UserManagementController {
 								
 							} else //the information in the database is newer so we need to update the device
 							{
+								LOG.info("Database user information is newer, copying it to device");
+								
 								updatedJsonUser.setUserName(user.getUserName());
 								updatedJsonUser.setPassword("");
 								updatedJsonUser.setZip(String.valueOf(user.getZip().getZip()));
 								updatedJsonUser.setFamilySize(user.getFamilySize());
-								
-								/*
-								String userStoresIdString = "";
-								
-								for (final Store store : user.getStores())
-								{
-									userStoresIdString+=Long.valueOf(store.getId())+"-";
-								}
-								
-								//remove last "-"
-								userStoresIdString = userStoresIdString.substring(0, userStoresIdString.lastIndexOf("-"));
-								
-								updatedJsonUser.setStores(userStoresIdString);
-								*/
 								
 								updatedJsonUser.setStores(user.getStores());
 								
 								updatedJsonUser.setLastUpdated(df.format(user.getUserInformationLastUpdate()));
 								
 								//debug
-						    	LOG.debug("Updated User Name: "+updatedJsonUser.getUserName()); //name
+						    	LOG.info("Updated User Name: "+updatedJsonUser.getUserName()); //name
 						    	LOG.debug("Updated User Password: "+updatedJsonUser.getPassword()); //password
 						    	LOG.debug("Updated User Zip: "+updatedJsonUser.getZip()); //zip
 						    	LOG.debug("Updated User Family Size: "+updatedJsonUser.getFamilySize()); //family size
 						    	LOG.debug("Updated User Stores: "+updatedJsonUser.getStores()); //stores
-						    	LOG.debug("Updated Last Updated: "+updatedJsonUser.getLastUpdated()); //last updated
+						    	LOG.info("Updated Last Updated: "+updatedJsonUser.getLastUpdated()); //last updated
 							}
 						} catch (final NumberFormatException | ParseException e) {
 							// TODO Auto-generated catch block
